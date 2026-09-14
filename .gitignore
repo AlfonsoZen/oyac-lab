@@ -1,0 +1,36 @@
+# Tareas de teoría: son trabajo individual, sólo existen en este equipo local
+# y nunca se suben al repositorio (que es para las prácticas de laboratorio en
+# equipo). Ver CLAUDE.md.
+tarea[0-9]*/
+
+# Salidas de compilación de LaTeX (se regeneran con latexmk -outdir=out).
+out/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+
+# Artefactos de Quartus Prime / proyectos FPGA (se regeneran al compilar).
+**/db/
+**/incremental_db/
+**/simulation/
+**/output_files/
+*.qws
+*.rpt
+*.summary
+*.smsg
+*.done
+*.qdf
+*.pin
+*.sof
+*.pof
+*.jdi
+*.jic
+
+# Basura de sistema operativo o de transferencia de archivos entre equipos.
+*:Zone.Identifier
+.DS_Store
+Thumbs.db
