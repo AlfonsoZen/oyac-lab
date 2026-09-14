@@ -52,13 +52,22 @@ laboratorio: "Laboratorio de Organización de Arquitectura de Computadoras"
 profesor: "ING. KAREN PÉREZ"
 grupo_laboratorio: "06"
 semestre: "2027-1"
+equipo_laboratorio: "9"
 integrantes:
   - nombre: "Omar Alfonso Zendejas Labias"
     grupo_teoria: "04"
+  - nombre: "Emiliano García Olvera"
+    grupo_teoria: "02"
 ```
 
 > El nombre del laboratorio va **literal como lo escribió la profesora**, aunque falte
 > la "y" en "Organización y Arquitectura". No lo corrijas.
+
+> **Trabajo en equipo:** a partir de la práctica 2 el laboratorio se realiza en pareja
+> (equipo 9). La práctica 1 fue individual y no lleva `equipo_laboratorio` ni el segundo
+> integrante en su portada; consérvala tal cual está. De la práctica 2 en adelante, la
+> portada debe listar a **ambos** integrantes (cada uno con su propio grupo de teoría) y
+> mostrar el número de equipo junto a los datos de grupo.
 
 ### `practicaN/meta.yml`
 
@@ -246,7 +255,7 @@ la izquierda, tal como en el ejemplo de la profesora. El comando recibe todo de
 \centering
 \noindent
 \begin{minipage}[c]{0.45\textwidth}\centering
-  \includegraphics[height=3.2cm]{logo-unam.png}
+  \includegraphics[height=3.2cm]{logo-unam.jpg}
 \end{minipage}\hfill
 \begin{minipage}[c]{0.45\textwidth}\centering
   \includegraphics[height=3.2cm]{logo-fi.png}
@@ -263,25 +272,29 @@ la izquierda, tal como en el ejemplo de la profesora. El comando recibe todo de
 \vspace{0.9cm}
 {\bfseries Reporte - <TÍTULO DE LA PRÁCTICA>\par}
 
-\vspace{2.2cm}
+\vspace{1.3cm}
 \raggedright
 {\bfseries NOMBRE DE LOS INTEGRANTES:}\\
-Omar Alfonso Zendejas Labias \quad Grupo de Teoría: 04
+Omar Alfonso Zendejas Labias \quad Grupo de Teoría: 04\\
+Emiliano García Olvera \quad Grupo de Teoría: 02
 
-\vspace{2.5cm}
+\vspace{1.3cm}
 {\bfseries NOMBRE DEL PROFESOR: ING. KAREN PÉREZ}
 
 \vspace{0.6cm}
-{\bfseries GRUPO: 06}
+{\bfseries GRUPO: 06 \quad EQUIPO: 9}
 
 \vspace{0.6cm}
 {\bfseries SEMESTRE:} \underline{2027-1.}
 
-\vspace{1.2cm}
+\vspace{0.6cm}
 \hfill {\bfseries FECHA DE ENTREGA: <FECHA>}
 \thispagestyle{empty}
 \end{titlepage}
 ```
+
+(Portada válida desde la práctica 2; la práctica 1, individual, no lleva el segundo
+integrante ni EQUIPO.)
 
 ---
 

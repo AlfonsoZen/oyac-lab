@@ -5,6 +5,11 @@ laboratorio: "Laboratorio de Organización de Arquitectura de Computadoras"
 profesor: "ING. KAREN PÉREZ"
 grupo_laboratorio: "06"
 semestre: "2027-1"
+# A partir de la práctica 2 el trabajo de laboratorio es en equipo (equipo_laboratorio
+# aplica desde entonces; la práctica 1 fue individual y no lo usa).
+equipo_laboratorio: "9"
 integrantes:
   - nombre: "Omar Alfonso Zendejas Labias"
     grupo_teoria: "04"
+  - nombre: "Emiliano García Olvera"
+    grupo_teoria: "02"
