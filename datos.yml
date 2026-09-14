@@ -1,0 +1,10 @@
+universidad: "UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO"
+facultad: "FACULTAD DE INGENIERÍA"
+carrera: "INGENIERÍA EN COMPUTACIÓN"
+laboratorio: "Laboratorio de Organización de Arquitectura de Computadoras"
+profesor: "ING. KAREN PÉREZ"
+grupo_laboratorio: "06"
+semestre: "2027-1"
+integrantes:
+  - nombre: "Omar Alfonso Zendejas Labias"
+    grupo_teoria: "04"
