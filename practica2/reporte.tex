@@ -1,0 +1,197 @@
+\input{../plantilla/preambulo.tex}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\noindent
+\begin{minipage}[c]{0.45\textwidth}\centering
+  \includegraphics[height=3.2cm]{logo-unam.jpg}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.45\textwidth}\centering
+  \includegraphics[height=3.2cm]{logo-fi.png}
+\end{minipage}
+
+\vspace{1.2cm}
+{\Large\bfseries UNIVERSIDAD NACIONAL AUTÓNOMA\\[2pt] DE MÉXICO\par}
+\vspace{0.9cm}
+{\large\bfseries FACULTAD DE INGENIERÍA\par}
+\vspace{0.6cm}
+{\large\bfseries INGENIERÍA EN COMPUTACIÓN\par}
+\vspace{0.6cm}
+{\bfseries Laboratorio de Organización de Arquitectura de Computadoras\par}
+\vspace{0.9cm}
+{\bfseries Reporte - Diseño de máquinas de estado\par}
+
+\vspace{1.3cm}
+\raggedright
+{\bfseries NOMBRE DE LOS INTEGRANTES:}\\
+Omar Alfonso Zendejas Labias \quad Grupo de Teoría: 04\\
+Emiliano García Olvera \quad Grupo de Teoría: 02
+
+\vspace{1.3cm}
+{\bfseries NOMBRE DEL PROFESOR: ING. KAREN PÉREZ}
+
+\vspace{0.6cm}
+{\bfseries GRUPO: 06 \quad EQUIPO: 9}
+
+\vspace{0.6cm}
+{\bfseries SEMESTRE:} \underline{2027-1.}
+
+\vspace{0.6cm}
+\hfill {\bfseries FECHA DE ENTREGA: 15 de septiembre de 2026}
+\thispagestyle{empty}
+\end{titlepage}
+
+\setcounter{page}{1}
+
+\section{Objetivo}
+
+Se busca analizar, diseñar e implementar una máquina de estados finitos a partir de una
+carta ASM proporcionada, identificando el funcionamiento de los \textit{flip-flops} tipo
+D como elementos de memoria. A partir del llenado de la tabla de transiciones y de la
+reducción mediante mapas de Karnaugh se obtienen las funciones de estado siguiente y de
+salida, las cuales posteriormente se implementan en VHDL y se verifican sobre la tarjeta
+de desarrollo FPGA DE10-Lite.
+
+\section{Introducción}
+
+Una carta \textit{ASM} (\textit{Algorithmic State Machine}) es una representación
+gráfica del comportamiento de un circuito secuencial, equivalente a un diagrama de
+estados, en la que cada estado se dibuja como una caja rectangular y cada condición de
+transición como una caja de decisión. A diferencia del diagrama de estados clásico, la
+carta ASM se asemeja a un diagrama de flujo y resulta más directa para derivar, a partir
+de ella, la tabla de transiciones del sistema.
+
+En una implementación síncrona, el estado de la máquina se almacena en un conjunto de
+\textit{flip-flops} tipo D, que actúan como elementos de memoria: en cada flanco de
+\textit{clock} capturan el valor calculado como estado siguiente y lo mantienen hasta el
+siguiente flanco. Las entradas $D$ de estos \textit{flip-flops}, así como las señales de
+salida de la máquina, se obtienen como funciones booleanas del estado actual y de las
+entradas del sistema; dichas funciones se simplifican mediante mapas de Karnaugh a
+partir de la tabla de transiciones, siguiendo el procedimiento estándar de diseño de
+circuitos secuenciales síncronos descrito, entre otros, por Savage Carmona \emph{et al.}
+\cite{savage}.
+
+\section{Desarrollo}
+
+\subsection{Parte I. Análisis y diseño de la máquina de estados}
+
+La carta ASM proporcionada para esta práctica se muestra en la figura
+\ref{fig:asm}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.55\textwidth]{Practica_2_ASM.pdf}
+  \caption{Carta ASM del sistema, proporcionada en el manual de la práctica.}
+  \label{fig:asm}
+\end{figure}
+
+\subsubsection{Identificación de estados, entradas y salidas}
+
+\todo[inline]{Identificar a partir de la figura \ref{fig:asm}: número y nombre de los
+  estados (EST0-EST3), las entradas de la máquina ($X$, $Y$) y las señales de salida
+  (S1, S0), describiendo brevemente qué representa cada una.}
+
+\subsubsection{Codificación de los estados}
+
+\todo[inline]{Determinar el número de bits necesarios para codificar los cuatro estados
+  y proponer la codificación binaria de cada uno (EST0, EST1, EST2, EST3).}
+
+\subsubsection{Tabla de transiciones}
+
+\todo[inline]{Obtener la tabla de transiciones completa a partir de la carta ASM,
+  considerando estado actual, entradas $X$ y $Y$, estado siguiente y salidas S1 S0 para
+  cada combinación.}
+
+\subsubsection{Mapas de Karnaugh}
+
+\todo[inline]{Construir los mapas de Karnaugh correspondientes a cada entrada $D$ de los
+  flip-flops y a cada señal de salida, a partir de la tabla de transiciones anterior.}
+
+\subsubsection{Funciones booleanas simplificadas}
+
+\todo[inline]{Simplificar, a partir de los mapas de Karnaugh, las funciones booleanas de
+  cada entrada $D$ y de cada salida.}
+
+\subsubsection{Circuito resultante}
+
+\todo[inline]{Dibujar el circuito completo de la máquina de estados: flip-flops tipo D,
+  compuertas de la lógica de estado siguiente y compuertas de la lógica de salida.}
+
+\subsection{Parte II. Implementación en Quartus y FPGA DE10-Lite}
+
+Como base para generar la señal de reloj lenta necesaria para observar las transiciones
+de la máquina de estados en la FPGA, la profesora proporcionó el módulo divisor de
+frecuencia \texttt{div\_frec.vhd}, mostrado en la figura \ref{fig:div_frec}.
+
+\begin{figure}[H]
+  \centering
+  \lstinputlisting[style=hdl,caption={Módulo \texttt{div\_frec.vhd}, proporcionado por
+    la profesora como base del proyecto.},label={fig:div_frec}]{codigo/div_frec.vhd}
+\end{figure}
+
+\todo[inline]{Este módulo es el punto de partida entregado por la profesora; falta
+  agregar en \texttt{codigo/} el módulo VHDL de la máquina de estados diseñada por el
+  equipo en la Parte I, así como el módulo de nivel superior que integre ambos.}
+
+\subsubsection{Creación del proyecto en Quartus}
+
+\todo[inline]{Documentar la creación del proyecto en Quartus Prime para el dispositivo
+  de la FPGA DE10-Lite (familia, modelo o dispositivo por defecto utilizado).}
+
+\subsubsection{Diagrama lógico e integración con \texttt{div\_frec.vhd}}
+
+\todo[inline]{Mostrar el diagrama de bloques o esquema de cómo se conecta el módulo
+  \texttt{div\_frec.vhd} con el módulo de la máquina de estados (señal de reloj lento,
+  entradas $X$/$Y$, salidas S1/S0).}
+
+\subsubsection{Implementación en VHDL}
+
+\todo[inline]{Incluir el código VHDL de la máquina de estados implementada por el
+  equipo, una vez que exista en \texttt{codigo/}.}
+
+\subsubsection{Asignación de pines}
+
+\todo[inline]{Documentar la asignación de las entradas, salidas e interrupciones del
+  diseño a los recursos físicos de la tarjeta DE10-Lite (interruptores, LEDs, botones,
+  etc.).}
+
+\subsubsection{Compilación y programación de la FPGA}
+
+\todo[inline]{Reportar la compilación del proyecto (errores encontrados y su corrección)
+  y la programación de la FPGA DE10-Lite.}
+
+\subsubsection{Comprobación experimental}
+
+\todo[inline]{Incluir evidencia (fotografías o capturas) de las transiciones de la
+  máquina de estados comprobadas físicamente en la tarjeta, contrastándolas con lo
+  indicado en la carta ASM.}
+
+\section{Análisis de resultados}
+
+\todo[inline]{Esta sección depende de las capturas de simulación y de la comprobación en
+  la FPGA (Parte II). Debe comparar el comportamiento obtenido en la tarjeta física
+  contra el llenado de la tabla de transiciones realizado en la Parte I, señalando si
+  coinciden o si hay discrepancias.}
+
+\section{Conclusiones individuales}
+
+\subsection{Omar Alfonso Zendejas Labias}
+
+\todo[inline]{Redactar la conclusión individual una vez concluidas ambas partes de la
+  práctica.}
+
+\subsection{Emiliano García Olvera}
+
+\todo[inline]{Redactar la conclusión individual una vez concluidas ambas partes de la
+  práctica.}
+
+\begin{thebibliography}{9}
+\bibitem{savage} J. Savage Carmona, G. Vázquez y N. E. Chávez Rodríguez,
+  \emph{Diseño de microprocesadores}. Ciudad de México, México: Facultad de Ingeniería,
+  Universidad Nacional Autónoma de México, 2017. [En línea]. Disponible:
+  \url{http://profesores.fi-b.unam.mx/luist/archivos/MicroprocesadoresSavage.pdf}
+\end{thebibliography}
+
+\end{document}
