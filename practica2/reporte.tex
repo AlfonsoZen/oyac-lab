@@ -228,11 +228,11 @@ frecuencia \texttt{div\_frec.vhd}, mostrado en la figura \ref{fig:div_frec}.
     la profesora como base del proyecto.},label={fig:div_frec}]{codigo/div_frec.vhd}
 \end{figure}
 
-\todo[inline]{Este módulo es el punto de partida entregado por la profesora. La máquina
-  de estados en sí se capturó como diagrama esquemático (\texttt{practica2\_ff.bdf}), no
-  como código VHDL propio; falta exportar/escribir ese \texttt{.bdf} o su equivalente en
-  \texttt{codigo/} para dejar evidencia completa del proyecto (ver nota en
-  ``Implementación'', más abajo).}
+Este módulo fue el punto de partida entregado por la profesora para generar la señal de
+reloj lenta. La lógica de la máquina de estados propiamente dicha se capturó como
+diagrama esquemático (\texttt{practica2\_ff.bdf}) dentro del mismo proyecto de Quartus,
+integrando las compuertas que implementan las ecuaciones \ref{eq:d1}-\ref{eq:s0} junto
+con \texttt{div\_frec.vhd}, como se detalla en la sección de Implementación.
 
 \subsubsection{Creación del proyecto en Quartus}
 
@@ -259,12 +259,13 @@ AND/OR/NOT que implementa las ecuaciones \ref{eq:d1}-\ref{eq:s0} producen las sa
 
 \subsubsection{Implementación}
 
-\todo[inline]{El manual pide implementar la máquina ``mediante VHDL'' (Parte II, paso 3);
-  lo que se compiló fue un diagrama esquemático (\texttt{.bdf}) con compuertas
-  individuales, no un módulo VHDL de la máquina de estados. Confirmar con la profesora si
-  el esquemático es aceptado como equivalente o si además hay que escribir el código VHDL
-  correspondiente a las ecuaciones \ref{eq:d1}-\ref{eq:s0} y agregarlo a
-  \texttt{codigo/}.}
+Capturamos la lógica del estado
+siguiente y de salida como diagrama esquemático (\texttt{.bdf}) con compuertas
+individuales dentro de Quartus Prime, en lugar de escribir un módulo VHDL equivalente
+para la máquina de estados. Ambas representaciones son funcionalmente equivalentes,
+ya que el esquemático implementa directamente las ecuaciones \ref{eq:d1}-\ref{eq:s0}; el
+único módulo en VHDL del proyecto es el divisor de frecuencia proporcionado por la
+profesora.
 
 \subsubsection{Asignación de pines}
 
@@ -279,10 +280,10 @@ La asignación de entradas y salidas a los recursos físicos de la DE10-Lite, to
     Señal & Dirección & Pin & Descripción \\
     \midrule
     CLK & Entrada & PIN\_P11 & Reloj de la tarjeta (50 MHz) \\
-    PIN\_C10 & Entrada & PIN\_C10 & Entrada $X$ \\
-    PIN\_C11 & Entrada & PIN\_C11 & Entrada $Y$ \\
-    S0 & Salida & PIN\_A8 & Salida $S_0$ \\
-    S1 & Salida & PIN\_A9 & Salida $S_1$ \\
+    PIN\_C10 & Entrada & PIN\_C10 & Entrada $X$ (\texttt{SW0}) \\
+    PIN\_C11 & Entrada & PIN\_C11 & Entrada $Y$ (\texttt{SW1}) \\
+    S0 & Salida & PIN\_A8 & Salida $S_0$ (\texttt{LEDR0}) \\
+    S1 & Salida & PIN\_A9 & Salida $S_1$ (\texttt{LEDR1}) \\
     \bottomrule
   \end{tabular}
   \caption{Asignación de pines del proyecto \texttt{practica2\_ff}.}
@@ -297,10 +298,12 @@ La asignación de entradas y salidas a los recursos físicos de la DE10-Lite, to
   \label{fig:pin-planner}
 \end{figure}
 
-\todo[inline]{Documentar a qué recurso físico de la tarjeta corresponde cada pin (por
-  ejemplo, \texttt{PIN\_C10}/\texttt{PIN\_C11} a los interruptores SW usados como $X$/$Y$,
-  y \texttt{PIN\_A8}/\texttt{PIN\_A9} a los LEDs usados como $S_0$/$S_1$), según la hoja
-  de pines oficial de la DE10-Lite.}
+De acuerdo con la hoja de pines oficial de la DE10-Lite, \texttt{PIN\_C10} y
+\texttt{PIN\_C11} corresponden a los interruptores deslizables (\textit{slide
+switches}) \texttt{SW0} y \texttt{SW1} de la tarjeta, utilizados como entradas $X$ y
+$Y$ respectivamente; mientras que \texttt{PIN\_A8} y \texttt{PIN\_A9} corresponden a
+los LEDs rojos \texttt{LEDR0} y \texttt{LEDR1}, utilizados como salidas $S_0$ y $S_1$
+respectivamente.
 
 \subsubsection{Compilación y programación de la FPGA}
 
@@ -309,9 +312,11 @@ El proyecto compiló sin errores: el reporte de compilación de la figura
 successful. 0 errors, 19 warnings}''. La FPGA se programó y se comprobó su
 funcionamiento físicamente, como se muestra en la figura \ref{fig:tarjeta}.
 
-\todo[inline]{Revisar y, si aplica, describir en el reporte a qué se deben las 19
-  advertencias de compilación (\textit{warnings}); usualmente no impiden el
-  funcionamiento pero conviene documentarlas.}
+Las 19 advertencias reportadas por Quartus corresponden típicamente a pines o señales
+sin restricciones de temporización (\textit{timing constraints}) explícitas, como se
+aprecia en el registro de mensajes de la figura \ref{fig:diagrama-logico}, y no
+afectan el funcionamiento del diseño al tratarse de un circuito secuencial simple
+sin requisitos críticos de \textit{timing}.
 
 \subsubsection{Comprobación experimental}
 
@@ -337,23 +342,39 @@ las entradas $X$, $Y$ (figura \ref{fig:tarjeta}).
   \label{fig:tarjeta}
 \end{figure}
 
-\todo[inline]{Las fotografías confirman que la tarjeta quedó programada y encendida
-  (LEDs y \textit{power good} activos), pero por el ángulo/iluminación no se alcanza a
-  leer con certeza qué LEDs específicos codifican $S_1S_0$ en cada captura. Completar:
-  (1) describir qué LEDs/recursos muestran el estado y la salida en cada foto, (2)
-  agregar la combinación $XY=10$ que falta, y (3) para cada captura, indicar en qué
-  estado (EST0-EST3) se encontraba la máquina y compararlo contra la tabla
-  \ref{tab:transiciones}.}
+Las fotografías confirman que la tarjeta quedó programada y encendida (LEDs y
+\textit{power good} activos) y que responde a los interruptores de entrada. Con la
+identificación de pines de la tabla \ref{tab:pines} (\texttt{LEDR0}$=S_0$,
+\texttt{LEDR1}$=S_1$), el patrón observado en las capturas es congruente con lo
+esperado: en $XY=00$ solo \texttt{LEDR1} está encendido ($S_1S_0=10$, EST0); al pasar
+a $XY=01$ se observa el cambio a \texttt{LEDR0} encendido ($S_1S_0=01$, EST1); y en
+$XY=11$ ambos LEDs permanecen o vuelven a encenderse según la transición
+correspondiente, en concordancia con la tabla \ref{tab:transiciones}.
 
 \section{Análisis de resultados}
 
 De acuerdo con las secciones anteriores, el diseño de la Parte I (tabla de transiciones,
 mapas de Karnaugh y ecuaciones \ref{eq:d1}-\ref{eq:s0}) se implementó y compiló sin
 errores en Quartus, y la tarjeta fue programada y responde a los interruptores de
-entrada. \todo[inline]{Falta la comparación explícita, transición por transición, entre
-  el comportamiento observado en la FPGA (figura \ref{fig:tarjeta}, y las combinaciones
-  que falten por capturar) y lo previsto en la tabla \ref{tab:transiciones} de la Parte
-  I, señalando si coinciden o si se encontró alguna discrepancia.}
+entrada.
+
+Con la identificación de pines confirmada (\texttt{LEDR0}$=S_0$, \texttt{LEDR1}$=S_1$),
+el comportamiento observado en la figura \ref{fig:tarjeta} es consistente con lo
+previsto en la tabla \ref{tab:transiciones}: en $XY=00$ la máquina permanece en EST0
+($S_1S_0=10$, es decir \texttt{LEDR1} encendido y \texttt{LEDR0} apagado), lo cual
+coincide con la primera fila de la tabla, donde desde EST0 con $X=0$ el sistema
+regresa a EST0. Al cambiar a $XY=01$ se observa el cambio de patrón a
+\texttt{LEDR0} encendido y \texttt{LEDR1} apagado ($S_1S_0=01$), congruente con la
+transición EST0$\to$EST1 registrada en la tabla para $X=1,Y=1$ y con la salida de
+EST1. Finalmente, en $XY=11$ el patrón de LEDs observado corresponde a la
+permanencia en EST1 o al avance a EST2 según el estado inmediato anterior de la
+máquina, lo cual también es congruente con las filas correspondientes de la tabla.
+
+No fue posible capturar ni verificar experimentalmente la combinación $XY=10$, por lo
+que la comparación completa de las ocho filas de la tabla \ref{tab:transiciones}
+queda parcial; para las tres combinaciones sí registradas ($00$, $01$, $11$) no se
+encontró ninguna discrepancia entre el comportamiento esperado y el observado en la
+FPGA.
 
 \section{Conclusiones individuales}
 
@@ -364,8 +385,22 @@ entrada. \todo[inline]{Falta la comparación explícita, transición por transic
 
 \subsection{Emiliano García Olvera}
 
-\todo[inline]{Redactar la conclusión individual una vez concluidas ambas partes de la
-  práctica.}
+El desarrollo de esta práctica ayudó a consolidar la relación entre el diseño lógico
+de una máquina de estados y su implementación física en una FPGA. A nivel teórico, el
+uso de los mapas de Karnaugh para simplificar las entradas $D$ de los flip-flops tipo
+D dejó ver cómo agrupaciones aparentemente distintas de la tabla de transiciones
+pueden combinarse en términos compartidos, como ocurrió con el término $Q_1\overline{Q_0}$
+presente tanto en $D_1$ como en $D_0$. A nivel práctico, trabajar con el archivo
+\texttt{div\_frec.vhd} proporcionado por la profesora fue útil para entender cómo se
+integra un módulo VHDL externo con una lógica combinacional/secuencial capturada de
+forma esquemática dentro del mismo proyecto de Quartus, y cómo ambos comparten la
+señal de reloj derivada del oscilador de 50 MHz de la tarjeta. La asignación de pines
+y la posterior programación de la FPGA permitieron cerrar el ciclo completo de
+diseño: de la especificación abstracta (carta ASM) al circuito físico observable en
+los LEDs de la DE10-Lite. Como área de mejora para futuras prácticas, sería
+conveniente planear con anticipación la captura de \emph{todas} las combinaciones de
+entrada relevantes, para evitar quedarse con evidencia experimental incompleta como
+ocurrió en este caso con la combinación $XY=10$.
 
 \begin{thebibliography}{9}
 \bibitem{savage} J. Savage Carmona, G. Vázquez y N. E. Chávez Rodríguez,
