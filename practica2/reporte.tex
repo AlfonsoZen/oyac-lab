@@ -224,8 +224,10 @@ frecuencia \texttt{div\_frec.vhd}, mostrado en la figura \ref{fig:div_frec}.
 
 \begin{figure}[H]
   \centering
-  \lstinputlisting[style=hdl,caption={Módulo \texttt{div\_frec.vhd}, proporcionado por
-    la profesora como base del proyecto.},label={fig:div_frec}]{codigo/div_frec.vhd}
+  \lstinputlisting[style=hdl]{codigo/div_frec.vhd}
+  \caption{Módulo \texttt{div\_frec.vhd}, proporcionado por la profesora como base del
+    proyecto.}
+  \label{fig:div_frec}
 \end{figure}
 
 Este módulo fue el punto de partida entregado por la profesora para generar la señal de
@@ -266,6 +268,58 @@ para la máquina de estados. Ambas representaciones son funcionalmente equivalen
 ya que el esquemático implementa directamente las ecuaciones \ref{eq:d1}-\ref{eq:s0}; el
 único módulo en VHDL del proyecto es el divisor de frecuencia proporcionado por la
 profesora.
+
+Como el manual pide explícitamente la implementación en VHDL, a continuación se incluye
+el código equivalente de la máquina de estados, escrito directamente a partir de las
+ecuaciones \ref{eq:d1}-\ref{eq:s0} obtenidas en la Parte I. Este código se presenta
+únicamente como documentación de dicha implementación: no se integró al proyecto de
+Quartus ni se compiló, por lo que no sustituye al esquemático de la figura
+\ref{fig:diagrama-logico}, que es el que efectivamente se programó en la tarjeta.
+
+\begin{figure}[H]
+\begin{lstlisting}[style=hdl]
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity maquina_estados is
+    Port ( clk : in  STD_LOGIC;
+           X   : in  STD_LOGIC;
+           Y   : in  STD_LOGIC;
+           S1  : out STD_LOGIC;
+           S0  : out STD_LOGIC);
+end maquina_estados;
+
+architecture Behavioral of maquina_estados is
+    signal Q1, Q0 : STD_LOGIC := '0';
+    signal D1, D0 : STD_LOGIC;
+begin
+
+    -- Estado siguiente (ecuaciones 1 y 2)
+    D1 <= (Q1 and not Q0) or (not Q1 and Q0 and X and Y);
+    D0 <= (Q1 and not Q0) or (not Q0 and X and Y)
+          or (not Q1 and Q0 and not X) or (not Q1 and Q0 and not Y);
+
+    -- Flip-flops tipo D: capturan el estado siguiente en cada flanco de subida
+    process (clk)
+    begin
+        if rising_edge(clk) then
+            Q1 <= D1;
+            Q0 <= D0;
+        end if;
+    end process;
+
+    -- Salidas (ecuaciones 3 y 4)
+    S1 <= (not Q1 and not Q0) or (Q1 and Q0);
+    S0 <= Q0;
+
+end Behavioral;
+\end{lstlisting}
+\caption{Código VHDL de la máquina de estados, escrito a partir de las ecuaciones
+  \ref{eq:d1}-\ref{eq:s0} de la Parte I. Entrada de \texttt{clk}: en la integración con
+  \texttt{div\_frec.vhd}, correspondería a la señal \texttt{div\_clk} (reloj ya
+  dividido), no al reloj de 50 MHz de la tarjeta.}
+\label{fig:vhdl-maquina}
+\end{figure}
 
 \subsubsection{Asignación de pines}
 
@@ -380,8 +434,18 @@ FPGA.
 
 \subsection{Omar Alfonso Zendejas Labias}
 
-\todo[inline]{Redactar la conclusión individual una vez concluidas ambas partes de la
-  práctica.}
+El objetivo de la práctica se cumplió: a partir de la carta ASM llegamos a la tabla de
+transiciones, redujimos por Karnaugh las ecuaciones de los flip-flops D y de las
+salidas, y ese diseño es justo el que terminó compilado en Quartus y programado en la
+tarjeta. Lo que más se me facilitó fue precisamente esa parte de pasar de la carta ASM a
+la tabla, ya que al tener bien identificadas las rutas de decisión el llenado fue
+prácticamente directo. En la tarjeta, para las combinaciones que sí alcanzamos a
+fotografiar ($XY=00$, $01$ y $11$) el comportamiento de los LEDs coincidió con lo que la
+tabla de la Parte I predecía, así que el diseño quedó validado, aunque nos falta
+capturar la combinación $XY=10$ para dejar la comprobación completa. También queda
+pendiente confirmar con la profesora si capturar la máquina como esquemático en vez de
+escribirla en VHDL es válido para esta entrega, ya que el manual pide explícitamente esa
+segunda opción.
 
 \subsection{Emiliano García Olvera}
 

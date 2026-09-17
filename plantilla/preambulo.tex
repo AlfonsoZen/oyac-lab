@@ -50,4 +50,13 @@
            {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {ü}{{\"u}}1 {¿}{{?`}}1 {¡}{{!`}}1
 }
 \lstset{style=hdl}
-\renewcommand{\lstlistingname}{Figura}   % el código se numera junto a las figuras
+% Para que el código comparta numeración con las figuras (en vez de tener su propio
+% contador "Listing"), NO usar caption=/label= dentro de lstlisting/lstinputlisting.
+% En su lugar, envolver el listado en un \begin{figure} normal y poner \caption y
+% \label ahí (\figurename ya es "Figura" por babel-spanish):
+%   \begin{figure}[H]
+%     \centering
+%     \lstinputlisting[style=hdl]{codigo/archivo.vhd}
+%     \caption{Descripción del código.}
+%     \label{fig:archivo}
+%   \end{figure}
