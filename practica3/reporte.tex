@@ -51,7 +51,388 @@ Emiliano García Olvera \quad Grupo de Teoría: 02
 
 \section{Objetivo}
 
-Familiarizar al alumno con la construcción de máquinas de estados mediante el uso de
-memorias, aplicando el método de direccionamiento por trayectoria.
+Construir una máquina de estados finita a partir de una carta ASM empleando una memoria
+como elemento central del diseño, bajo el método de direccionamiento por trayectoria. A
+diferencia del diseño clásico con \textit{flip-flops} y ecuaciones booleanas obtenidas
+por mapas de Karnaugh, aquí la lógica de estado siguiente y de salidas no se sintetiza
+como compuertas, sino que se almacena explícitamente en localidades de memoria.
+
+Para ello se diseñó una carta ASM de cinco estados, tres entradas y cuatro salidas (dos
+con lógica estándar y dos con lógica negada), se determinó el tamaño de memoria
+requerido, se obtuvo su contenido completo y se implementó el sistema en VHDL sobre la
+tarjeta de desarrollo DE10-Lite mediante Quartus Prime, verificando su funcionamiento
+en hardware.
+
+\section{Introducción}
+
+Una carta ASM (\textit{Algorithmic State Machine}) es una representación gráfica del
+comportamiento de un circuito secuencial que se asemeja a un diagrama de flujo: los
+estados se dibujan como cajas rectangulares, las condiciones de transición como cajas
+de decisión y las salidas que dependen simultáneamente del estado y de las entradas
+como cajas ovaladas, denominadas salidas condicionales. Esta distinción corresponde a
+los dos modelos clásicos de máquina secuencial: en el modelo de Moore las salidas son
+función únicamente del estado presente, mientras que en el modelo de Mealy dependen
+también de las entradas, por lo que pueden cambiar sin que medie un flanco de
+\textit{clock} \cite{mano}.
+
+El método de implementación empleado en esta práctica sustituye la red combinacional de
+estado siguiente por una memoria. En el \textbf{direccionamiento por trayectoria}, cada
+localidad de memoria guarda dos campos: la \textit{liga}, que codifica la dirección del
+estado siguiente, y la \textit{parte de las salidas}, que contiene el valor de las
+señales de salida \cite{savage}. La dirección con la que se consulta la memoria se forma
+concatenando la liga del estado presente con las variables de entrada; la palabra leída
+se divide nuevamente en liga y salidas, y la liga se almacena en un registro cuya salida
+realimenta las líneas de dirección. La señal de reloj conectada a ese registro determina
+la velocidad a la que avanza la máquina de estados.
+
+Puesto que la dirección se compone de los bits de estado más los bits de entrada, el
+tamaño de la memoria queda determinado por
+
+\begin{equation}
+\text{Memoria} = 2^{n} \times m
+\label{eq:tam}
+\end{equation}
+
+donde $n$ es el número total de bits de dirección ($n = $ bits de estado $+$ bits de
+entrada) y $m$ el número de bits almacenados por localidad ($m = $ bits de liga $+$ bits
+de salidas). Debe notarse que la memoria contempla \emph{todas} las combinaciones
+posibles de las variables de entrada para cada estado, incluso aquellas que ese estado
+no evalúa; en tales casos las localidades correspondientes repiten la misma liga, ya que
+la transición es independiente de esas variables \cite{savage}.
+
+La ventaja de este esquema es que modificar el comportamiento de la máquina no requiere
+rediseñar lógica combinacional, sino únicamente reescribir el contenido de la memoria.
+A cambio, el costo en bits crece exponencialmente con el número de entradas, pues cada
+entrada adicional duplica la cantidad de localidades necesarias.
+
+\section{Desarrollo}
+
+\subsection{Planteamiento: carta ASM}
+
+Se diseñó una carta ASM que cumple con las características solicitadas en el manual:
+cinco estados, tres entradas ($Q_1$, $Q_2$ y $Q_3$) y cuatro salidas, de las cuales
+$S_1$ y $S_2$ operan con lógica estándar (activas en 1) y $S_3$ y $S_4$ con lógica
+negada (activas en 0, lo que se indica con una barra sobre el nombre de la señal).
+Adicionalmente se incorporaron salidas condicionales en ambos caminos de una decisión,
+tal como lo exige el punto 1 del manual. El desarrollo original realizado a mano se
+muestra en la figura \ref{fig:asm-mano}, y su versión redibujada en limpio, que será la
+referencia para el resto del reporte, en la figura \ref{fig:asm-digital}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.85\textwidth]{parte1-00.jpg}
+  \caption{Desarrollo manuscrito de la carta ASM y del cálculo del tamaño de memoria.}
+  \label{fig:asm-mano}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.72\textwidth]{parte1-01-carta-asm.png}
+  \caption{Carta ASM propuesta: cinco estados, tres entradas y cuatro salidas, con
+  salidas condicionales en ambos caminos de las decisiones de EST1 y EST4.}
+  \label{fig:asm-digital}
+\end{figure}
+
+Antes de construir la tabla de transiciones fue necesario asignar a cada estado una
+representación binaria. Dado que la carta tiene cinco estados, se requieren
+$\lceil \log_2 5 \rceil = 3$ bits, con lo que la asignación queda como se indica en la
+tabla \ref{tab:estados}. Los tres códigos restantes (\texttt{101}, \texttt{110} y
+\texttt{111}) no corresponden a ningún estado de la carta.
+
+\begin{table}[H]
+  \centering
+  \caption{Asignación binaria de los estados y salida incondicional asociada a cada uno.}
+  \label{tab:estados}
+  \begin{tabular}{@{}l c l l@{}}
+    \toprule
+    \textbf{Estado} & \textbf{Código} & \textbf{Salida incondicional} & \textbf{Variable evaluada} \\
+    \midrule
+    EST0 & \texttt{000} & $S_1$              & $Q_1$ \\
+    EST1 & \texttt{001} & ---                & $Q_2$ \\
+    EST2 & \texttt{010} & $\overline{S_4}$   & $Q_3$ \\
+    EST3 & \texttt{011} & $S_2$              & $Q_1$ \\
+    EST4 & \texttt{100} & ---                & $Q_3$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+El comportamiento de la máquina es el siguiente. En EST0 se activa $S_1$ de forma
+incondicional y la máquina permanece en ese estado mientras $Q_1 = 0$; cuando
+$Q_1 = 1$ avanza a EST1. EST1 no activa ninguna salida incondicional y evalúa $Q_2$:
+por la rama falsa se activa la salida condicional $\overline{S_3}$ y se transita a
+EST3, mientras que por la rama verdadera se activa la salida condicional $S_2$ y se
+transita a EST2. En EST2 se activa $\overline{S_4}$ y, según $Q_3$, la máquina regresa
+a EST0 ($Q_3 = 0$) o avanza a EST4 ($Q_3 = 1$). EST3 activa $S_2$ y se autolaza
+mientras $Q_1 = 0$, avanzando a EST4 cuando $Q_1 = 1$. Finalmente, EST4 evalúa $Q_3$
+con salidas condicionales en ambos caminos: con $Q_3 = 0$ activa $\overline{S_4}$ y se
+autolaza, y con $Q_3 = 1$ activa $S_1$ y retorna a EST0.
+
+Respecto a la codificación de las salidas negadas, se adoptó el criterio de almacenar
+en memoria el \emph{nivel físico} de la señal: el bit correspondiente a $\overline{S_3}$
+o $\overline{S_4}$ vale \texttt{0} cuando la salida está activa y \texttt{1} cuando se
+encuentra en reposo, de manera inversa a $S_1$ y $S_2$. Con ello la palabra leída de la
+memoria se conecta directamente a los pines de salida, sin inversores intermedios.
+
+\subsection{Tamaño de la memoria necesaria}
+
+De acuerdo con la ecuación \ref{eq:tam}, la dirección se forma con los 3 bits del estado
+presente y los 3 bits de entrada, por lo que $n = 3 + 3 = 6$. Cada localidad almacena
+los 3 bits de la liga y los 4 bits de salidas, de modo que $m = 3 + 4 = 7$. Por lo tanto
+
+\[
+\text{Memoria} = 2^{6} \times 7 = 64 \times 7 = 448 \text{ bits},
+\]
+
+es decir, 64 localidades de 7 bits cada una. De esas 64 localidades, únicamente
+$5 \times 2^{3} = 40$ corresponden a estados que existen en la carta ASM; las 24
+restantes pertenecen a los códigos \texttt{101}, \texttt{110} y \texttt{111}, que no se
+utilizan. Dichas localidades no pueden omitirse del dispositivo físico, puesto que un
+bus de direcciones de 6 bits las hace accesibles, por lo que se les asignó un contenido
+seguro: liga hacia EST0 y salidas en reposo, de forma que si la máquina llegara a uno de
+esos códigos por una condición anómala, retornaría al estado inicial en el siguiente
+flanco de \textit{clock}.
+
+\todo[inline]{Conciliar con el cálculo manuscrito de la figura \ref{fig:asm-mano}, que
+reporta 280 bits (40 localidades $\times$ 7). Ese número corresponde a las localidades
+efectivamente utilizadas; la fórmula $2^n \times m$ del manual, con $n = 6$, da 448
+bits. Definir con el equipo cuál de los dos se reporta como respuesta al punto 2.}
+
+\subsection{Contenido de la memoria}
+
+El contenido completo de la memoria se obtuvo recorriendo la carta ASM estado por estado
+y, para cada uno, enumerando las ocho combinaciones posibles de $Q_1Q_2Q_3$. La
+dirección se forma como
+
+\[
+\text{dir} = \underbrace{\text{Edo. presente}}_{\text{dir}(5{:}3)} \ \Vert \
+\underbrace{Q_1\,Q_2\,Q_3}_{\text{dir}(2{:}0)}
+\qquad\text{y}\qquad
+\text{dato} = \underbrace{\text{Liga}}_{\text{dato}(6{:}4)} \ \Vert \
+\underbrace{S_1\,S_2\,S_3\,S_4}_{\text{dato}(3{:}0)}
+\]
+
+En los estados que evalúan una sola variable, las localidades correspondientes a las
+combinaciones que difieren únicamente en las variables no evaluadas comparten la misma
+liga y las mismas salidas. Por ejemplo, EST0 solo depende de $Q_1$, de modo que las
+direcciones 0 a 3 ($Q_1 = 0$) tienen liga \texttt{000} y las direcciones 4 a 7
+($Q_1 = 1$) tienen liga \texttt{001}, sin importar el valor de $Q_2$ y $Q_3$. La tabla
+\ref{tab:memoria} presenta las 64 localidades resultantes.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Contenido de memoria obtenido por direccionamiento por trayectoria. Las
+  direcciones 40 a 63 corresponden a los códigos de estado no utilizados.}
+  \label{tab:memoria}
+  \footnotesize
+\input{tabla_memoria.tex}
+\end{table}
+
+\subsection{Implementación en VHDL}
+
+El sistema se describió en VHDL siguiendo la estructura de la figura 1 del manual,
+repartido en cinco módulos más una entidad de nivel superior que los interconecta. El
+flujo de datos es el siguiente: el estado presente y las entradas se unen en el
+concatenador para formar la dirección; la memoria entrega la palabra de 7 bits; el
+divisor de datos la separa en liga y salidas; y la liga regresa al registro de estado,
+que la captura en el siguiente flanco del reloj dividido.
+
+El módulo \texttt{concatenador\_datos}, mostrado en la figura \ref{fig:concat}, une el
+estado presente en la parte alta de la dirección y las entradas en la parte baja.
+
+\lstinputlisting[style=hdl]{codigo/concatenador_datos.vhd}
+\captionof{figure}{Código VHDL del concatenador que forma la dirección de memoria.}
+\label{fig:concat}
+
+El módulo \texttt{memory} implementa la ROM de 64 palabras de 7 bits. Cada asignación
+corresponde a un renglón de la tabla \ref{tab:memoria}, agrupada por estado y comentada
+con la combinación de entradas que le da origen. El código se muestra en la figura
+\ref{fig:memory}.
+
+\lstinputlisting[style=hdl]{codigo/memory.vhd}
+\captionof{figure}{Código VHDL de la memoria con las 64 localidades del direccionamiento por
+  trayectoria.}
+\label{fig:memory}
+
+El módulo \texttt{divisor\_datos} de la figura \ref{fig:divisor} realiza la operación
+inversa al concatenador: separa los tres bits más significativos de la palabra leída
+como liga y los cuatro menos significativos como salidas.
+
+\lstinputlisting[style=hdl]{codigo/divisor_datos.vhd}
+\captionof{figure}{Código VHDL del divisor que separa la liga de las salidas.}
+\label{fig:divisor}
+
+El registro de estado, mostrado en la figura \ref{fig:register}, es el único elemento
+secuencial del lazo principal. Cuenta con un \textit{reset} asíncrono activo en bajo que
+fuerza el estado \texttt{000} (EST0), y en cada flanco de subida captura la liga
+entregada por la memoria.
+
+\lstinputlisting[style=hdl]{codigo/register2.vhd}
+\captionof{figure}{Código VHDL del registro que almacena el estado presente.}
+\label{fig:register}
+
+Dado que el oscilador de la tarjeta opera a 50~MHz, las transiciones resultarían
+imperceptibles para el observador. Por ello se incluyó el divisor de frecuencia de la
+figura \ref{fig:divfrec}, que genera el reloj con el que avanza la máquina. El contador
+se reinicia al alcanzar el valor \texttt{X"2FAF080"} ($50\,000\,000$) y la salida se
+toma del bit 25, lo que produce un periodo de
+$50\,000\,001 / 50 \times 10^{6} \approx 1.0$~s; es decir, \textbf{una transición de
+estado por segundo}.
+
+\lstinputlisting[style=hdl]{codigo/div_frec.vhd}
+\captionof{figure}{Código VHDL del divisor de frecuencia que fija la velocidad de la máquina.}
+\label{fig:divfrec}
+
+Finalmente, la entidad de nivel superior \texttt{Practica3} instancia los cinco módulos
+anteriores y los interconecta mediante señales internas, además de exponer el estado
+presente hacia los LEDs para poder observarlo. Su código se muestra en la figura
+\ref{fig:top}.
+
+\lstinputlisting[style=hdl]{codigo/Practica3.vhd}
+\captionof{figure}{Código VHDL de la entidad de nivel superior que interconecta los módulos.}
+\label{fig:top}
+
+\subsection{Asignación de pines}
+
+Para la implementación en la tarjeta DE10-Lite (dispositivo MAX 10 10M50DAF484C7G) se
+realizó la asignación de pines de la tabla \ref{tab:pines}. Las tres entradas se
+asignaron a interruptores deslizables, el \textit{reset} al botón \texttt{KEY0} (que la
+tarjeta entrega en bajo al ser presionado, lo cual coincide con la polaridad del
+registro), las cuatro salidas a los LEDs \texttt{LEDR0}--\texttt{LEDR3} y el estado
+presente a \texttt{LEDR7}--\texttt{LEDR9}.
+
+\begin{table}[H]
+  \centering
+  \caption{Asignación de pines en la tarjeta DE10-Lite.}
+  \label{tab:pines}
+  \begin{tabular}{@{}l l l l@{}}
+    \toprule
+    \textbf{Señal} & \textbf{Pin} & \textbf{Recurso} & \textbf{Función} \\
+    \midrule
+    \texttt{CLK50}  & \texttt{PIN\_P11} & \texttt{MAX10\_CLK1\_50} & Reloj de 50 MHz \\
+    \texttt{RESET}  & \texttt{PIN\_B8}  & \texttt{KEY0}   & \textit{Reset} activo en bajo \\
+    \texttt{Q1}     & \texttt{PIN\_C10} & \texttt{SW0}    & Entrada $Q_1$ \\
+    \texttt{Q2}     & \texttt{PIN\_C11} & \texttt{SW1}    & Entrada $Q_2$ \\
+    \texttt{Q3}     & \texttt{PIN\_D12} & \texttt{SW2}    & Entrada $Q_3$ \\
+    \texttt{S1}     & \texttt{PIN\_A8}  & \texttt{LEDR0}  & Salida $S_1$ (activa en 1) \\
+    \texttt{S2}     & \texttt{PIN\_A9}  & \texttt{LEDR1}  & Salida $S_2$ (activa en 1) \\
+    \texttt{S3}     & \texttt{PIN\_A10} & \texttt{LEDR2}  & Salida $\overline{S_3}$ (activa en 0) \\
+    \texttt{S4}     & \texttt{PIN\_B10} & \texttt{LEDR3}  & Salida $\overline{S_4}$ (activa en 0) \\
+    \texttt{EDO[2]} & \texttt{PIN\_B11} & \texttt{LEDR9}  & Bit 2 del estado presente \\
+    \texttt{EDO[1]} & \texttt{PIN\_A11} & \texttt{LEDR8}  & Bit 1 del estado presente \\
+    \texttt{EDO[0]} & \texttt{PIN\_D14} & \texttt{LEDR7}  & Bit 0 del estado presente \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Análisis de resultados}
+
+El proyecto se compiló en Quartus Prime 18.1.0 Lite Edition sin errores. La tabla
+\ref{tab:sintesis} resume los recursos utilizados y el desempeño reportado por la
+herramienta.
+
+\begin{table}[H]
+  \centering
+  \caption{Resumen de compilación del proyecto en Quartus Prime 18.1.}
+  \label{tab:sintesis}
+  \begin{tabular}{@{}l r@{}}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Elementos lógicos            & 61 / 49\,760 ($<1\%$) \\
+    Registros dedicados          & 31 / 49\,760 ($<1\%$) \\
+    Pines de E/S                 & 12 / 360 (3\%) \\
+    Bits de memoria embebida     & 0 / 1\,677\,312 (0\%) \\
+    $F_{max}$ (modelo 1200 mV, 85 $^\circ$C) & 180.34 MHz \\
+    Errores de compilación       & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Dos resultados de la tabla \ref{tab:sintesis} merecen comentario. El primero es el conteo
+de 31 registros, que coincide exactamente con lo esperado del diseño: 28 corresponden al
+contador del divisor de frecuencia y los 3 restantes al registro de estado. Esto confirma
+que el único elemento secuencial del lazo de la máquina de estados es dicho registro, tal
+como plantea el esquema de direccionamiento por trayectoria. El segundo es que la
+herramienta reporta 0 bits de memoria embebida: la ROM de 448 bits no se mapeó a los
+bloques M9K del dispositivo, sino que se sintetizó como lógica combinacional dentro de
+los 61 elementos lógicos. Esto es razonable dado su tamaño reducido y no altera el
+comportamiento del circuito, aunque implica que el contenido de memoria quedó fijo en la
+configuración del FPGA y no puede reescribirse en tiempo de ejecución.
+
+En cuanto a la frecuencia máxima, los 180.34 MHz reportados superan ampliamente los
+50 MHz del oscilador de la tarjeta, por lo que el diseño opera con holgura. El analizador
+temporal emite una advertencia de incumplimiento de restricciones únicamente porque el
+proyecto no incluye un archivo \texttt{.sdc}; en ausencia de restricciones declaradas,
+Quartus asume un requisito por omisión de 1 GHz.
+
+El funcionamiento del circuito se verificó directamente sobre la tarjeta DE10-Lite ante
+la profesora durante la sesión de laboratorio. Con todos los interruptores en cero, la
+máquina permanece indefinidamente en EST0 con \texttt{LEDR0} encendido, comportamiento
+que coincide con las direcciones 0 a 3 de la tabla \ref{tab:memoria}, cuya liga apunta al
+propio EST0. Al fijar $Q_1 = 1$ y $Q_2 = 1$ se observó el ciclo
+EST0 $\to$ EST1 $\to$ EST2 $\to$ EST0, avanzando un estado por segundo, congruente con
+las ligas de las direcciones 4, 10 y 16. Con $Q_1 = 1$ y $Q_2 = 0$ se recorrió la rama
+opuesta, EST0 $\to$ EST1 $\to$ EST3 $\to$ EST4, quedando la máquina en EST4 por el
+autolazo que impone $Q_3 = 0$, tal como indican las direcciones 32, 34, 36 y 38.
+
+La observación más relevante se obtuvo con la máquina detenida en EST4. Al conmutar
+$Q_3$ de 0 a 1, los LEDs de salida cambiaron de inmediato (\texttt{LEDR3} se encendió y
+\texttt{LEDR0} también), mientras que los LEDs de estado conservaron el valor
+\texttt{100} hasta el siguiente flanco del reloj dividido, momento en el cual la máquina
+transitó a EST0. Este desfase entre el cambio de las salidas y el cambio del estado es
+precisamente el comportamiento esperado del esquema: las salidas provienen de forma
+combinacional de la palabra leída, y como la dirección incluye las entradas, modificar
+$Q_3$ cambia la localidad consultada de manera instantánea. El estado, en cambio, solo
+se actualiza cuando el registro captura la liga en el flanco de reloj. Se verificó
+también que al regresar $Q_3$ a 0 antes del flanco, la máquina permanece en EST4, lo que
+confirma que la decisión se resuelve con el valor de la entrada presente en el instante
+del flanco.
+
+Respecto a las salidas con lógica negada, se comprobó que \texttt{LEDR2} y \texttt{LEDR3}
+permanecen encendidos durante la mayor parte de la operación y se apagan únicamente
+cuando $\overline{S_3}$ o $\overline{S_4}$ se activan, lo cual es consistente con el
+criterio de codificación adoptado y con los valores de la columna
+$S_1S_2S_3S_4$ de la tabla \ref{tab:memoria}.
+
+No se detectó ninguna discrepancia entre el comportamiento observado en la tarjeta y el
+previsto por la carta ASM de la figura \ref{fig:asm-digital}.
+
+\todo[inline]{Opcional: agregar la captura del RTL Viewer de Quartus para ilustrar la
+interconexión de los cinco módulos, y la captura del Pin Planner como respaldo de la
+tabla \ref{tab:pines}.}
+
+\section{Conclusiones individuales}
+
+\subsection{Omar Alfonso Zendejas Labias}
+
+Se cumplió el objetivo de la práctica. La máquina de cinco estados quedó implementada
+con una memoria de 64 localidades de 7 bits y funcionó en la tarjeta tal como lo predice
+la carta ASM, recorriendo las dos ramas de la decisión de EST1 y respetando los autolazos
+de EST3 y EST4. Lo que más me ayudó a entender el método fue ver en la tarjeta que al
+mover $Q_3$ estando en EST4 las salidas cambiaban de inmediato pero el estado no: ahí
+quedó claro que la dirección de la memoria se arma con el estado y las entradas juntos, y
+que el registro es lo único que espera al flanco de reloj. También me sirvió comparar
+este método con el de la práctica anterior, donde había que obtener las ecuaciones por
+mapas de Karnaugh; aquí cambiar el comportamiento de la máquina sería solo reescribir
+renglones de la tabla. Queda pendiente definir con el equipo si el tamaño que se reporta
+son los 448 bits que da la fórmula del manual o los 280 bits de las localidades que
+realmente se usan.
+
+\subsection{Emiliano García Olvera}
+
+\todo[inline]{Conclusión individual de Emiliano. Siguiendo el formato: un solo párrafo,
+en primera persona, indicando si se cumplió el objetivo y relacionándolo con los
+resultados concretos del reporte (tabla \ref{tab:memoria}, tabla \ref{tab:sintesis} o lo
+observado en la tarjeta), sin narrar la experiencia personal.}
+
+\renewcommand{\refname}{Bibliografía}
+\begin{thebibliography}{9}
+\bibitem{savage} J. Savage Carmona, G. Vázquez y N. E. Chávez Rodríguez,
+  \emph{Diseño de microprocesadores}. Ciudad de México, México: Facultad de Ingeniería,
+  Universidad Nacional Autónoma de México, 2017. [En línea]. Disponible:
+  \url{http://profesores.fi-b.unam.mx/luist/archivos/MicroprocesadoresSavage.pdf}
+\bibitem{mano} M. M. Mano y M. D. Ciletti, \emph{Diseño digital}, 5a ed.
+  Naucalpan de Juárez, México: Pearson Educación, 2013.
+\end{thebibliography}
 
 \end{document}

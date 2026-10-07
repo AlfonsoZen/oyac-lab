@@ -112,9 +112,16 @@ En este orden exacto (es el formato de la profesora):
    - el planteamiento del problema (carta ASM, tabla de estados, ecuaciones),
    - el **código VHDL completo** en bloque `lstlisting` con pie de figura,
    - explicación de cómo se definieron estados, entradas y transiciones.
-5. **Análisis de resultados.** — Capturas de simulación (Quartus/ModelSim) y/o fotos
-   del hardware, cada una con su interpretación: qué se observa, por qué coincide (o no)
-   con lo esperado según la carta ASM.
+5. **Análisis de resultados.** — Capturas de simulación (Quartus/ModelSim), reportes de
+   compilación y, en general, la evidencia que sí se documenta, cada una con su
+   interpretación: qué se observa, por qué coincide (o no) con lo esperado según la
+   carta ASM.
+
+   > **No incluyas fotos de la tarjeta física.** La profesora valida el funcionamiento
+   > en la FPGA **en persona**, durante la sesión de laboratorio, y comentó
+   > explícitamente que no hacen falta en el reporte. Describe en prosa lo que se
+   > verificó en la tarjeta (secuencia de estados observada, comportamiento de las
+   > salidas) y apóyate en las evidencias digitales.
 6. **Conclusiones individuales.** — Un subtítulo por integrante con su nombre.
 7. **Bibliografía.** — Formato **IEEE**.
 
@@ -307,7 +314,10 @@ integrante ni EQUIPO.)
 - Si no existe, redacta el pie a partir de lo que se ve en la imagen y lístame los pies
   que inventaste para que los valide.
 - Ancho por defecto: `width=0.8\textwidth` para capturas de simulación,
-  `width=0.6\textwidth` para diagramas y fotos de hardware. `[H]` como posición.
+  `width=0.6\textwidth` para diagramas. `[H]` como posición.
+- **No pidas ni insertes fotos de la tarjeta física** (ver sección 4): la validación en
+  hardware es presencial ante la profesora y no se documenta con fotos. Si la carpeta
+  `evidencias/` trae alguna, úsala solo si yo te lo pido expresamente.
 - Recorta márgenes muertos con `trim`/`clip` solo si la captura trae barras de
   navegador o escritorio de por medio.
 
