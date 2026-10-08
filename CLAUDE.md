@@ -30,7 +30,7 @@ de esa carpeta y producir `out/reporte.pdf` con el formato que la profesora defi
 │   ├── codigo/                # fuentes VHDL/Verilog (.vhd, .v)
 │   ├── notas.md               # opcional: observaciones mías durante la práctica
 │   ├── reporte.tex            # lo generas tú
-│   └── out/                   # salida de compilación (ignorada por git)
+│   └── out/                   # salida de compilación (ignorada, salvo reporte.pdf)
 ├── practica2/
 └── ...
 ```
@@ -184,6 +184,17 @@ Después de compilar, **verifica siempre**:
 5. Si algo falla, corrige y recompila; no me entregues un PDF que no revisaste.
 
 Limpieza: `latexmk -c -outdir=out`.
+
+> **`out/reporte.pdf` sí se versiona.** Es la única excepción a la regla de ignorar
+> `out/`: se commitea junto con los cambios del `.tex` para que el otro integrante vea
+> el avance y los `\todo` pendientes sin compilar. Si al hacer `pull` sale conflicto en
+> ese PDF, no lo resuelvas a mano: recompila y vuelve a agregarlo.
+>
+> ```bash
+> git checkout --theirs practica3/out/reporte.pdf   # o --ours, da igual
+> latexmk -pdf -interaction=nonstopmode -outdir=out reporte.tex
+> git add practica3/out/reporte.pdf
+> ```
 
 ---
 

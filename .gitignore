@@ -4,7 +4,10 @@
 tarea[0-9]*/
 
 # Salidas de compilación de LaTeX (se regeneran con latexmk -outdir=out).
-out/
+# Excepción: reporte.pdf SÍ se versiona, para que el equipo pueda ver el avance y
+# los \todo pendientes sin tener que compilar. Todo lo demás de out/ se ignora.
+**/out/*
+!**/out/reporte.pdf
 *.aux
 *.fdb_latexmk
 *.fls
