@@ -184,7 +184,7 @@ la capacidad física total requerida por el esquema de direccionamiento es:
 \text{Memoria total} = 2^{6} \times 7 = 64 \times 7 = 448 \text{ bits},
 \]
 
-es decir, un arreglo de 64 localidades de 7 bits cada una. 
+es decir, un arreglo de 64 localidades de 7 bits cada una.
 
 Es importante destacar la distinción entre la capacidad física del arreglo de memoria y la
 capacidad efectivamente utilizada por la máquina de estados:
@@ -373,6 +373,24 @@ temporal emite una advertencia de incumplimiento de restricciones únicamente po
 proyecto no incluye un archivo \texttt{.sdc}; en ausencia de restricciones declaradas,
 Quartus asume un requisito por omisión de 1 GHz.
 
+No se detectó ninguna discrepancia entre el comportamiento previsto por la carta ASM de la
+figura \ref{fig:asm-digital} y el de la simulación. Antes de cargar el diseño en la tarjeta,
+el comportamiento se verificó mediante simulación funcional con un \textit{testbench} que aplica
+una secuencia de diez valores de $Q_1Q_2Q_3$, uno por cada transición de estado. Para que la
+simulación fuera manejable, el divisor de frecuencia se sustituyó temporalmente por una versión
+que genera un flanco cada 1000 ciclos de CLK50 (20~$\mu$s), en lugar de 50\,000\,000 ciclos. La
+figura \ref{fig:sim} muestra las formas de onda obtenidas. La secuencia de \texttt{EDO} observada,
+001, 011, 100, 000, 000, 001, 010, 100, 100, 000, coincide con la traza esperada a partir de la
+tabla \ref{tab:memoria}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\textwidth]{parte2-01.png}
+  \caption{Simulación funcional de \texttt{Practica3} en Questa: entradas \texttt{Q1}--\texttt{Q3},
+  salidas \texttt{S1}--\texttt{S4} y estado presente \texttt{EDO} a lo largo de diez transiciones.}
+  \label{fig:sim}
+\end{figure}
+
 El funcionamiento del circuito se verificó directamente sobre la tarjeta DE10-Lite ante
 la profesora durante la sesión de laboratorio. Con todos los interruptores en cero, la
 máquina permanece indefinidamente en EST0 con \texttt{LEDR0} encendido, comportamiento
@@ -402,17 +420,18 @@ cuando $\overline{S_3}$ o $\overline{S_4}$ se activan, lo cual es consistente co
 criterio de codificación adoptado y con los valores de la columna
 $S_1S_2S_3S_4$ de la tabla \ref{tab:memoria}.
 
-No se detectó ninguna discrepancia entre el comportamiento observado en la tarjeta y el
-previsto por la carta ASM de la figura \ref{fig:asm-digital}. El esquemático de la
-figura \ref{fig:esquematico} resume la interconexión de los cinco módulos tal como la
-reconoce Quartus, y permite seguir el lazo descrito a lo largo de esta sección: el
-estado presente y las entradas entran al concatenador, la memoria entrega la palabra, el
-divisor la separa en liga y salidas, y la liga regresa al registro.
+La figura \ref{fig:esquematico} muestra el diagrama de bloques de la entidad de nivel superior
+\texttt{Practica3}, con los nombres de puerto tal como se declaran en la figura \ref{fig:top}:
+\texttt{CLK50}, \texttt{RESET}, \texttt{Q1}, \texttt{Q2}, \texttt{Q3}, \texttt{S1}--\texttt{S4} y
+\texttt{EDO}. El diagrama resume la interconexión de los cinco módulos y permite seguir el lazo
+descrito a lo largo de esta sección: el estado presente y las entradas entran al concatenador, la
+memoria entrega la palabra, el divisor la separa en liga y salidas, y la liga regresa al registro.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=1.0\textwidth]{parte2-00.png}
-  \caption{Esquemático en Quartus con la interconexión de los cinco módulos.}
+  \caption{Diagrama de bloques de la entidad \texttt{Practica3} y de la interconexión de sus
+  cinco módulos, con los nombres de señales del código VHDL.}
   \label{fig:esquematico}
 \end{figure}
 
@@ -431,7 +450,9 @@ este método con el de la práctica anterior, donde había que obtener las ecuac
 mapas de Karnaugh; aquí cambiar el comportamiento de la máquina sería solo reescribir
 renglones de la tabla.
 
-\subsection{Emiliano García Olvera}Se cumplió satisfactoriamente con el objetivo de la práctica al implementar y validar en hardware una máquina de cinco estados estructurada mediante el método de direccionamiento por trayectoria. La concatenación del estado presente y las variables de entrada para direccionar la memoria ROM ($64 \times 7$ bits) demostró que es posible eliminar la red combinacional tradicional de estado siguiente, observando en la tarjeta DE10-Lite una respuesta combinacional inmediata en las salidas ante cambios en los interruptores ($Q_1, Q_2, Q_3$) mientras el estado permanece sincronizado al flanco del reloj de 1~Hz. Asimismo, el reporte de compilación (tabla \ref{tab:sintesis}) confirmó un uso mínimo de recursos con solo 61 elementos lógicos y 31 registros dedicados (28 para la división de frecuencia y 3 para el registro de estado), ratificando la efectividad de traducir la carta ASM directamente a una tabla de contenidos de memoria (tabla \ref{tab:memoria}).
+\subsection{Emiliano García Olvera}
+
+Se cumplió satisfactoriamente con el objetivo de la práctica al implementar y validar en hardware una máquina de cinco estados estructurada mediante el método de direccionamiento por trayectoria. La concatenación del estado presente y las variables de entrada para direccionar la memoria ROM ($64 \times 7$ bits) demostró que es posible eliminar la red combinacional tradicional de estado siguiente, observando en la tarjeta DE10-Lite una respuesta combinacional inmediata en las salidas ante cambios en los interruptores ($Q_1, Q_2, Q_3$) mientras el estado permanece sincronizado al flanco del reloj de 1~Hz. Asimismo, el reporte de compilación (tabla \ref{tab:sintesis}) confirmó un uso mínimo de recursos con solo 61 elementos lógicos y 31 registros dedicados (28 para la división de frecuencia y 3 para el registro de estado), ratificando la efectividad de traducir la carta ASM directamente a una tabla de contenidos de memoria (tabla \ref{tab:memoria}).
 
 \renewcommand{\refname}{Bibliografía}
 \begin{thebibliography}{9}
