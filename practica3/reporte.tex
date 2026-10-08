@@ -177,25 +177,33 @@ memoria se conecta directamente a los pines de salida, sin inversores intermedio
 
 De acuerdo con la ecuación \ref{eq:tam}, la dirección se forma con los 3 bits del estado
 presente y los 3 bits de entrada, por lo que $n = 3 + 3 = 6$. Cada localidad almacena
-los 3 bits de la liga y los 4 bits de salidas, de modo que $m = 3 + 4 = 7$. Por lo tanto
+los 3 bits de la liga y los 4 bits de salidas, de modo que $m = 3 + 4 = 7$. Por lo tanto,
+la capacidad física total requerida por el esquema de direccionamiento es:
 
 \[
-\text{Memoria} = 2^{6} \times 7 = 64 \times 7 = 448 \text{ bits},
+\text{Memoria total} = 2^{6} \times 7 = 64 \times 7 = 448 \text{ bits},
 \]
 
-es decir, 64 localidades de 7 bits cada una. De esas 64 localidades, únicamente
-$5 \times 2^{3} = 40$ corresponden a estados que existen en la carta ASM; las 24
-restantes pertenecen a los códigos \texttt{101}, \texttt{110} y \texttt{111}, que no se
-utilizan. Dichas localidades no pueden omitirse del dispositivo físico, puesto que un
-bus de direcciones de 6 bits las hace accesibles, por lo que se les asignó un contenido
-seguro: liga hacia EST0 y salidas en reposo, de forma que si la máquina llegara a uno de
-esos códigos por una condición anómala, retornaría al estado inicial en el siguiente
-flanco de \textit{clock}.
+es decir, un arreglo de 64 localidades de 7 bits cada una. 
 
-\todo[inline]{Conciliar con el cálculo manuscrito de la figura \ref{fig:asm-mano}, que
-reporta 280 bits (40 localidades $\times$ 7). Ese número corresponde a las localidades
-efectivamente utilizadas; la fórmula $2^n \times m$ del manual, con $n = 6$, da 448
-bits. Definir con el equipo cuál de los dos se reporta como respuesta al punto 2.}
+Es importante destacar la distinción entre la capacidad física del arreglo de memoria y la
+capacidad efectivamente utilizada por la máquina de estados:
+
+\begin{itemize}
+    \item \textbf{Memoria efectivamente utilizada (280 bits):} Puesto que la carta ASM
+    cuenta con solo 5 estados válidos y 3 entradas ($2^3 = 8$ combinaciones por estado),
+    únicamente $5 \times 8 = 40$ localidades corresponden al comportamiento definido del
+    sistema, sumando $40 \times 7 = 280$ bits de información útil.
+    \item \textbf{Espacio de direccionamiento decodificado (448 bits):} Dado que el bus de
+    direcciones es de 6 bits, el hardware decodifica inevitablemente 64 localidades. Las 24
+    localidades restantes (correspondientes a los códigos de estado no utilizados \texttt{101},
+    \texttt{110} y \texttt{111}) representan 168 bits de almacenamiento adicional.
+\end{itemize}
+
+Dichas localidades no pueden omitirse del dispositivo físico. Por ello, se les asignó un
+contenido explícito de seguridad (liga hacia EST0 y salidas en reposo), garantizando que si la
+máquina alcanzara un estado no válido debido a una condición anómala o de ruido, retornará de
+forma segura al estado inicial en el siguiente flanco de reloj.
 
 \subsection{Contenido de la memoria}
 
@@ -397,9 +405,12 @@ $S_1S_2S_3S_4$ de la tabla \ref{tab:memoria}.
 No se detectó ninguna discrepancia entre el comportamiento observado en la tarjeta y el
 previsto por la carta ASM de la figura \ref{fig:asm-digital}.
 
-\todo[inline]{Opcional: agregar la captura del RTL Viewer de Quartus para ilustrar la
-interconexión de los cinco módulos, y la captura del Pin Planner como respaldo de la
-tabla \ref{tab:pines}.}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=1.0\textwidth]{parte2-00.png}
+  \caption{Esquematico en Quartus mostrando la interconexion de los 5 modulos}
+  \label{fig:asm-mano}
+\end{figure}
 
 \section{Conclusiones individuales}
 
@@ -418,12 +429,7 @@ renglones de la tabla. Queda pendiente definir con el equipo si el tamaño que s
 son los 448 bits que da la fórmula del manual o los 280 bits de las localidades que
 realmente se usan.
 
-\subsection{Emiliano García Olvera}
-
-\todo[inline]{Conclusión individual de Emiliano. Siguiendo el formato: un solo párrafo,
-en primera persona, indicando si se cumplió el objetivo y relacionándolo con los
-resultados concretos del reporte (tabla \ref{tab:memoria}, tabla \ref{tab:sintesis} o lo
-observado en la tarjeta), sin narrar la experiencia personal.}
+\subsection{Emiliano García Olvera}Se cumplió satisfactoriamente con el objetivo de la práctica al implementar y validar en hardware una máquina de cinco estados estructurada mediante el método de direccionamiento por trayectoria. La concatenación del estado presente y las variables de entrada para direccionar la memoria ROM ($64 \times 7$ bits) demostró que es posible eliminar la red combinacional tradicional de estado siguiente, observando en la tarjeta DE10-Lite una respuesta combinacional inmediata en las salidas ante cambios en los interruptores ($Q_1, Q_2, Q_3$) mientras el estado permanece sincronizado al flanco del reloj de 1~Hz. Asimismo, el reporte de compilación (tabla \ref{tab:sintesis}) confirmó un uso mínimo de recursos con solo 61 elementos lógicos y 31 registros dedicados (28 para la división de frecuencia y 3 para el registro de estado), ratificando la efectividad de traducir la carta ASM directamente a una tabla de contenidos de memoria (tabla \ref{tab:memoria}).
 
 \renewcommand{\refname}{Bibliografía}
 \begin{thebibliography}{9}
