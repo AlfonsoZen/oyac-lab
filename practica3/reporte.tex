@@ -403,13 +403,17 @@ criterio de codificación adoptado y con los valores de la columna
 $S_1S_2S_3S_4$ de la tabla \ref{tab:memoria}.
 
 No se detectó ninguna discrepancia entre el comportamiento observado en la tarjeta y el
-previsto por la carta ASM de la figura \ref{fig:asm-digital}.
+previsto por la carta ASM de la figura \ref{fig:asm-digital}. El esquemático de la
+figura \ref{fig:esquematico} resume la interconexión de los cinco módulos tal como la
+reconoce Quartus, y permite seguir el lazo descrito a lo largo de esta sección: el
+estado presente y las entradas entran al concatenador, la memoria entrega la palabra, el
+divisor la separa en liga y salidas, y la liga regresa al registro.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=1.0\textwidth]{parte2-00.png}
-  \caption{Esquematico en Quartus mostrando la interconexion de los 5 modulos}
-  \label{fig:asm-mano}
+  \caption{Esquemático en Quartus con la interconexión de los cinco módulos.}
+  \label{fig:esquematico}
 \end{figure}
 
 \section{Conclusiones individuales}
@@ -425,9 +429,7 @@ quedó claro que la dirección de la memoria se arma con el estado y las entrada
 que el registro es lo único que espera al flanco de reloj. También me sirvió comparar
 este método con el de la práctica anterior, donde había que obtener las ecuaciones por
 mapas de Karnaugh; aquí cambiar el comportamiento de la máquina sería solo reescribir
-renglones de la tabla. Queda pendiente definir con el equipo si el tamaño que se reporta
-son los 448 bits que da la fórmula del manual o los 280 bits de las localidades que
-realmente se usan.
+renglones de la tabla.
 
 \subsection{Emiliano García Olvera}Se cumplió satisfactoriamente con el objetivo de la práctica al implementar y validar en hardware una máquina de cinco estados estructurada mediante el método de direccionamiento por trayectoria. La concatenación del estado presente y las variables de entrada para direccionar la memoria ROM ($64 \times 7$ bits) demostró que es posible eliminar la red combinacional tradicional de estado siguiente, observando en la tarjeta DE10-Lite una respuesta combinacional inmediata en las salidas ante cambios en los interruptores ($Q_1, Q_2, Q_3$) mientras el estado permanece sincronizado al flanco del reloj de 1~Hz. Asimismo, el reporte de compilación (tabla \ref{tab:sintesis}) confirmó un uso mínimo de recursos con solo 61 elementos lógicos y 31 registros dedicados (28 para la división de frecuencia y 3 para el registro de estado), ratificando la efectividad de traducir la carta ASM directamente a una tabla de contenidos de memoria (tabla \ref{tab:memoria}).
 
