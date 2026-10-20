@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{array}
+
+\newcolumntype{B}{>{\centering\arraybackslash}p{0.65cm}}
+
+\title{OyAC-Practica4}
+\author{Omar Alfonso Zendejas Labias}
+\date{Octubre 2026}
+
+\begin{document}
+
+\maketitle
+
+\section{Introducción}
+
+\begin{table}[H]
+\centering
+\caption{Contenido de memoria con direccionamiento entrada-estado}
+\label{tab:memoria}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ccccBBBBBBBB}
+\toprule
+ & & & & \multicolumn{4}{c}{\textbf{Salidas falsas}} & \multicolumn{4}{c}{\textbf{Salidas verdaderas}} \\
+\cmidrule(lr){5-8} \cmidrule(lr){9-12}
+\textbf{Edo. presente} & \textbf{Prueba} & \textbf{LF} & \textbf{LV} & $S_1$ & $S_2$ & $\overline{S_3}$ & $\overline{S_4}$ & $S_1$ & $S_2$ & $\overline{S_3}$ & $\overline{S_4}$ \\
+\midrule
+0000 & 00 & 0000 & 0001 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+0001 & 01 & 0010 & 0011 & 1 & 0 & 0 & 1 & 1 & 1 & 1 & 1 \\
+0010 & 10 & 0010 & 0100 & 0 & 0 & 1 & 0 & 0 & 0 & 1 & 0 \\
+0011 & 11 & 0101 & 0100 & 0 & 1 & 1 & 1 & 0 & 1 & 1 & 1 \\
+0100 & 00 & 0110 & 0111 & 1 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+0101 & 01 & 0101 & 0110 & 0 & 0 & 0 & 1 & 0 & 0 & 0 & 1 \\
+0110 & 10 & 0000 & 0111 & 1 & 0 & 1 & 1 & 1 & 0 & 1 & 0 \\
+0111 & 11 & 0111 & 1000 & 0 & 1 & 1 & 0 & 0 & 1 & 1 & 0 \\
+1000 & XX & 0000 & 0000 & 1 & 0 & 0 & 1 & 1 & 0 & 0 & 1 \\
+\midrule
+1001 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1010 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1011 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1100 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1101 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1110 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+1111 & XX & 0000 & 0000 & 0 & 0 & 1 & 1 & 0 & 0 & 1 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
