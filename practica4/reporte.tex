@@ -118,14 +118,23 @@ solicitadas: nueve estados, cuatro entradas ($Q_1$ a $Q_4$) y cuatro salidas, de
 cuales $S_1$ y $S_2$ operan con lógica estándar (activas en 1) y $S_3$ y $S_4$ con lógica
 negada (activas en 0, lo que se indica con una barra sobre el nombre). La carta incluye
 cuatro salidas condicionales, por encima de las tres que pide el manual, y respeta la
-restricción del método: ningún estado sensa más de una entrada.
+restricción del método: ningún estado sensa más de una entrada. El diseño preliminar a
+mano se muestra en la figura \ref{fig:evid-asm}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\textwidth]{01-carta-asm.png}
+  \includegraphics[width=0.78\textwidth]{practica4/evidencias/01-carta-asm.png}
   \caption{Carta ASM propuesta: nueve estados, cuatro entradas y cuatro salidas, con
   salidas condicionales en las decisiones de EST1, EST4 y EST6.}
   \label{fig:asm}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{practica4/evidencias/evidencia-carta-asm.jpg}
+  \caption{Evidencia del diseño manual de la carta ASM previo a su captura digital, con la
+  asignación de códigos de estado.}
+  \label{fig:evid-asm}
 \end{figure}
 
 Antes de construir la tabla fue necesario asignar una representación binaria tanto a los
@@ -197,9 +206,18 @@ de salida sin inversores intermedios.
 
 \subsection{Tamaño de la memoria necesaria}
 
-De acuerdo con la ecuación \ref{eq:tam}, la dirección se forma únicamente con los 4 bits
-del estado presente, por lo que $n = 4$ y la memoria tiene $2^4 = 16$ localidades. Cada
-localidad almacena los cinco campos del método:
+Los cálculos manuales de la codificación y del tamaño se muestran en la figura
+\ref{fig:evid-calc}. De acuerdo con la ecuación \ref{eq:tam}, la dirección se forma
+únicamente con los 4 bits del estado presente, por lo que $n = 4$ y la memoria tiene
+$2^4 = 16$ localidades. Cada localidad almacena los cinco campos del método:
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{practica4/evidencias/evidencia-calculos.jpg}
+  \caption{Evidencia del cálculo manual de la codificación y del tamaño de la memoria: 4 bits
+  de estado, 2 bits de prueba, 18 bits por localidad y 288 bits en total.}
+  \label{fig:evid-calc}
+\end{figure}
 
 \begin{center}
 \begin{tabular}{@{}l r@{}}
@@ -270,15 +288,26 @@ localidades.
 \input{tabla_memoria.tex}
 \end{table}
 
-\subsection{Implementación en VHDL}
+\subsection{Implementación en VHDL y diagrama de bloques}
 
 El sistema se describió en VHDL siguiendo el diagrama de bloques de la figura 3 del
-manual, repartido en siete módulos más una entidad de nivel superior. El lazo de datos es
-el siguiente: el registro de estado entrega el estado presente, que direcciona la memoria;
-la palabra leída se separa en sus cinco campos; el selector de entradas toma la parte de
-prueba y engancha una de las cuatro entradas; y el valor de esa entrada gobierna
-simultáneamente al selector de liga, cuya salida regresa al registro, y al selector de
-salidas, que maneja los pines $S_1$ a $S_4$.
+manual, repartido en siete módulos. Los módulos se interconectaron en un diagrama de bloques
+(archivo \texttt{.bdf}) de Quartus, que se configuró como entidad de nivel superior. La figura
+\ref{fig:bdf} muestra esa interconexión. El lazo de datos es el siguiente: el registro de
+estado entrega el estado presente, que direcciona la memoria; la palabra leída se separa en
+sus cinco campos; el selector de entradas toma la parte de prueba y engancha una de las cuatro
+entradas; y el valor de esa entrada gobierna simultáneamente al selector de liga, cuya salida
+regresa al registro, y al selector de salidas, que maneja los pines $S_1$ a $S_4$. El estado
+presente se expone hacia los LEDs para su observación.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{practica4/evidencias/diagrama-bloques.png}
+  \caption{Diagrama a bloques de nivel superior (archivo \texttt{.bdf}) que interconecta la
+  memoria, el divisor de datos, el registro de estado, el selector de entradas y los selectores
+  de liga y de salidas.}
+  \label{fig:bdf}
+\end{figure}
 
 El módulo \texttt{memory} implementa la ROM de 16 palabras de 18 bits. Cada asignación
 corresponde a un renglón de la tabla \ref{tab:memoria} y está comentada con el estado y la
@@ -335,14 +364,6 @@ de aproximadamente 1.0~s: una transición de estado por segundo.
 máquina.}
 \label{fig:divfrec}
 
-Finalmente, la entidad \texttt{practica4} instancia los siete módulos y los interconecta,
-además de exponer el estado presente hacia los LEDs para poder observarlo.
-
-\lstinputlisting[style=hdl]{codigo/practica4.vhd}
-\captionof{figure}{Código VHDL de la entidad de nivel superior que interconecta los
-módulos.}
-\label{fig:top}
-
 \subsection{Asignación de pines}
 
 Para la implementación en la tarjeta DE10-Lite (dispositivo MAX 10 10M50DAF484C7G) se
@@ -382,12 +403,12 @@ izquierda.
 
 \section{Análisis de resultados}
 
-El proyecto se compiló en Quartus Prime 18.1.0 Lite Edition sin errores. La tabla
+El proyecto se compiló en Quartus Prime 25.1std Lite Edition sin errores. La tabla
 \ref{tab:sintesis} resume los recursos utilizados y el desempeño reportado.
 
 \begin{table}[H]
   \centering
-  \caption{Resumen de compilación del proyecto en Quartus Prime 18.1.}
+  \caption{Resumen de compilación del proyecto en Quartus Prime 25.1std.}
   \label{tab:sintesis}
   \begin{tabular}{@{}l r@{}}
     \toprule
@@ -417,38 +438,55 @@ ausencia de restricciones Quartus asume un requisito por omisión de 1~GHz.
 
 \subsection{Simulación funcional}
 
-Antes de programar la tarjeta se verificó el diseño mediante simulación funcional en
-ModelSim con un \textit{testbench} autoverificable. El banco de pruebas aplica una
-secuencia de 22 vectores de entrada que recorre los nueve estados y ambas ramas de cada
-decisión, incluidas las cuatro salidas condicionales y el paso
-EST7 $\rightarrow$ EST8 $\rightarrow$ EST0, y compara el estado resultante de cada
-transición con el previsto por la carta ASM mediante sentencias \texttt{assert}. La
+Antes de programar la tarjeta se verificó el diseño mediante simulación funcional con
+un \textit{testbench} autoverificable. El banco de pruebas aplica una secuencia de 22
+vectores de entrada que recorre los nueve estados y ambas ramas de cada decisión, incluidas
+las cuatro salidas condicionales y el paso EST7 $\rightarrow$ EST8 $\rightarrow$ EST0. En cada
+transición compara el estado resultante con el previsto por la carta ASM mediante sentencias
+\texttt{assert}, y al finalizar reporta que las 22 transiciones coinciden con la carta. La
 simulación concluyó sin discrepancias.
 
-El \textit{testbench} instancia la cadena funcional completa (memoria, divisor de datos,
-selector de entradas, los dos multiplexores de 2 a 1 y el registro de estado) manejando el
-registro con un reloj directo de 10~ns. Se omite deliberadamente el divisor de frecuencia,
-ya que ese módulo sólo fija la velocidad perceptible en la tarjeta y simularlo exigiría
-$2^{25}$ ciclos por cada flanco.
+La simulación se compiló y ejecutó con GHDL, y la forma de onda se visualizó con GTKWave a
+partir del archivo \texttt{sim.vcd}. El \textit{testbench} instancia la cadena funcional
+completa (memoria, divisor de datos, selector de entradas, los dos multiplexores de 2 a 1 y
+el registro de estado) manejando el registro con un reloj directo de 10~ns. Se omite
+deliberadamente el divisor de frecuencia, ya que ese módulo sólo fija la velocidad perceptible
+en la tarjeta y simularlo exigiría $2^{25}$ ciclos por cada flanco.
 
-\todo[inline]{Insertar la captura del waveform de ModelSim. Se genera abriendo ModelSim en
-\texttt{C:\textbackslash intelFPGA\_lite\textbackslash 18.1\textbackslash practica4\textbackslash sim}
-y ejecutando \texttt{do wave.do}; el script ya deja agrupados el contenido de memoria
-(\texttt{PALABRA} y sus cinco campos) junto al estado presente, que es lo que pide el punto
-5 del manual.}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{practica4/evidencias/simulacion.png}
+  \caption{Forma de onda de la simulación funcional. Se muestran el reloj, el estado presente
+  (\texttt{edo}), la liga seleccionada y sus versiones falsa y verdadera, la palabra leída de
+  memoria (\texttt{palabra\_mem}), la parte de prueba, las entradas $Q_1$ a $Q_4$ y las
+  salidas $S_1$ a $S_4$, durante las 22 transiciones (0 a 250~ns).}
+  \label{fig:sim}
+\end{figure}
+
+En la figura se observa que el estado presente recorre los nueve estados de la carta y regresa
+a EST0 al final del recorrido. Cada cambio de estado coincide con un flanco de reloj, y las
+salidas $S_1$ a $S_4$ se activan según la rama tomada en cada decisión.
 
 \subsection{Verificación en la tarjeta}
 
-\todo[inline]{Redactar a partir de lo observado en la sesión de laboratorio. Conviene
-describir: (1) que con todos los interruptores abajo la máquina permanece en EST0, acorde
-con la liga falsa de la dirección 0; (2) el recorrido de algún lazo completo, por ejemplo
-EST0$\to$EST1$\to$EST2$\to$EST4$\to$EST7$\to$EST8$\to$EST0 con $Q_1$ y $Q_3$ en alto, y su
-correspondencia con las ligas de la tabla \ref{tab:memoria}; (3) que estando la máquina
-detenida en un estado que se autolaza (EST2, EST5 o EST7) los tres interruptores que no
-corresponden a su parte de prueba no producen ningún efecto, lo cual evidencia el selector
-de entradas y distingue a este método del direccionamiento por trayectoria; y (4) que
-\texttt{LEDR2} y \texttt{LEDR3} permanecen encendidos en reposo y se apagan al activarse
-$\overline{S_3}$ o $\overline{S_4}$.}
+Durante la sesión de laboratorio se programó la DE10-Lite con el diseño y se observó su
+comportamiento. Con los cuatro interruptores en bajo, la máquina permanece en EST0. Esto es
+consistente con la liga falsa de la dirección 0, que apunta a sí misma mientras $Q_1 = 0$.
+
+Al activar $Q_1$, $Q_2 = 0$, $Q_3 = 1$ y $Q_4 = 1$, la máquina recorre el lazo
+EST0$\to$EST1$\to$EST2$\to$EST4$\to$EST7$\to$EST8$\to$EST0. Cada transición corresponde a
+una liga de la tabla \ref{tab:memoria}: EST1 toma la liga falsa porque $Q_2 = 0$, EST2 toma
+la liga verdadera porque $Q_3 = 1$, EST4 toma la liga verdadera porque $Q_1 = 1$, EST7 toma
+la liga verdadera porque $Q_4 = 1$, y EST8 regresa a EST0 de forma incondicional.
+
+Al detenerse en un estado que se autolaza (EST2, EST5 o EST7), los interruptores que no
+corresponden a su parte de prueba no producen ningún efecto. Esto muestra que el selector de
+entradas sensa únicamente la variable indicada por la palabra almacenada, y es la diferencia
+principal con el direccionamiento por trayectoria.
+
+Por último, \texttt{LEDR2} y \texttt{LEDR3} permanecen encendidos en reposo, ya que la salida
+negada almacena un \texttt{1} cuando está inactiva. Se apagan al activarse $\overline{S_3}$ o
+$\overline{S_4}$, en los estados donde la carta ASM las activa.
 
 \section{Conclusiones individuales}
 
@@ -467,10 +505,17 @@ tiene espacio para dos ligas.
 
 \subsection{Emiliano García Olvera}
 
-\todo[inline]{Conclusión individual de Emiliano. Siguiendo el formato: un solo párrafo, en
-primera persona, indicando si se cumplió el objetivo y relacionándolo con los resultados
-concretos del reporte (tabla \ref{tab:memoria}, tabla \ref{tab:sintesis}, la simulación o
-lo observado en la tarjeta), sin narrar la experiencia personal.}
+Considero que se cumplió el objetivo de la práctica. Con el direccionamiento entrada-estado
+se construyó una máquina de nueve estados a partir de la carta ASM, usando una memoria de
+16 localidades de 18 bits (tabla \ref{tab:memoria}), lo que da un total de 288 bits. Frente
+al direccionamiento por trayectoria, que habría requerido 256 localidades y 1\,792 bits, la
+reducción es considerable. La tabla \ref{tab:sintesis} muestra que el diseño compila sin
+errores, utiliza menos del 1\% de los elementos lógicos del dispositivo y alcanza una
+frecuencia máxima de 189.68~MHz, por encima de los 50~MHz del oscilador. La simulación
+funcional con la secuencia de 22 vectores no presentó discrepancias, lo que confirma que
+cada transición coincide con la carta ASM. Lo que más me aportó la práctica fue entender por
+qué este método exige una sola prueba por estado: la palabra sólo tiene espacio para dos
+ligas, y ese límite es el costo que se paga por reducir el tamaño de la memoria.
 
 \renewcommand{\refname}{Bibliografía}
 \begin{thebibliography}{9}
