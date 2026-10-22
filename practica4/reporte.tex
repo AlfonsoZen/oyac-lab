@@ -1,4 +1,5 @@
 \input{../plantilla/preambulo.tex}
+\graphicspath{{evidencias/}{practica4/evidencias/}{../assets/}{assets/}}
 
 \begin{document}
 
@@ -123,7 +124,7 @@ mano se muestra en la figura \ref{fig:evid-asm}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\textwidth]{practica4/evidencias/01-carta-asm.png}
+  \includegraphics[width=0.78\textwidth]{01-carta-asm.png}
   \caption{Carta ASM propuesta: nueve estados, cuatro entradas y cuatro salidas, con
   salidas condicionales en las decisiones de EST1, EST4 y EST6.}
   \label{fig:asm}
@@ -131,7 +132,7 @@ mano se muestra en la figura \ref{fig:evid-asm}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{practica4/evidencias/evidencia-carta-asm.jpg}
+  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{evidencia-carta-asm.jpg}
   \caption{Evidencia del diseño manual de la carta ASM previo a su captura digital, con la
   asignación de códigos de estado.}
   \label{fig:evid-asm}
@@ -213,7 +214,7 @@ $2^4 = 16$ localidades. Cada localidad almacena los cinco campos del método:
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{practica4/evidencias/evidencia-calculos.jpg}
+  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{evidencia-calculos.jpg}
   \caption{Evidencia del cálculo manual de la codificación y del tamaño de la memoria: 4 bits
   de estado, 2 bits de prueba, 18 bits por localidad y 288 bits en total.}
   \label{fig:evid-calc}
@@ -288,26 +289,15 @@ localidades.
 \input{tabla_memoria.tex}
 \end{table}
 
-\subsection{Implementación en VHDL y diagrama de bloques}
+\subsection{Implementación en VHDL}
 
 El sistema se describió en VHDL siguiendo el diagrama de bloques de la figura 3 del
-manual, repartido en siete módulos. Los módulos se interconectaron en un diagrama de bloques
-(archivo \texttt{.bdf}) de Quartus, que se configuró como entidad de nivel superior. La figura
-\ref{fig:bdf} muestra esa interconexión. El lazo de datos es el siguiente: el registro de
-estado entrega el estado presente, que direcciona la memoria; la palabra leída se separa en
-sus cinco campos; el selector de entradas toma la parte de prueba y engancha una de las cuatro
-entradas; y el valor de esa entrada gobierna simultáneamente al selector de liga, cuya salida
-regresa al registro, y al selector de salidas, que maneja los pines $S_1$ a $S_4$. El estado
-presente se expone hacia los LEDs para su observación.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\textwidth]{practica4/evidencias/diagrama-bloques.png}
-  \caption{Diagrama a bloques de nivel superior (archivo \texttt{.bdf}) que interconecta la
-  memoria, el divisor de datos, el registro de estado, el selector de entradas y los selectores
-  de liga y de salidas.}
-  \label{fig:bdf}
-\end{figure}
+manual, repartido en siete módulos más una entidad de nivel superior. El lazo de datos es
+el siguiente: el registro de estado entrega el estado presente, que direcciona la memoria;
+la palabra leída se separa en sus cinco campos; el selector de entradas toma la parte de
+prueba y engancha una de las cuatro entradas; y el valor de esa entrada gobierna
+simultáneamente al selector de liga, cuya salida regresa al registro, y al selector de
+salidas, que maneja los pines $S_1$ a $S_4$.
 
 El módulo \texttt{memory} implementa la ROM de 16 palabras de 18 bits. Cada asignación
 corresponde a un renglón de la tabla \ref{tab:memoria} y está comentada con el estado y la
@@ -364,6 +354,14 @@ de aproximadamente 1.0~s: una transición de estado por segundo.
 máquina.}
 \label{fig:divfrec}
 
+Finalmente, la entidad \texttt{practica4} instancia los siete módulos y los interconecta,
+además de exponer el estado presente hacia los LEDs para poder observarlo.
+
+\lstinputlisting[style=hdl]{codigo/practica4.vhd}
+\captionof{figure}{Código VHDL de la entidad de nivel superior que interconecta los
+módulos.}
+\label{fig:top}
+
 \subsection{Asignación de pines}
 
 Para la implementación en la tarjeta DE10-Lite (dispositivo MAX 10 10M50DAF484C7G) se
@@ -403,12 +401,12 @@ izquierda.
 
 \section{Análisis de resultados}
 
-El proyecto se compiló en Quartus Prime 25.1std Lite Edition sin errores. La tabla
+El proyecto se compiló en Quartus Prime 18.1.0 Lite Edition sin errores. La tabla
 \ref{tab:sintesis} resume los recursos utilizados y el desempeño reportado.
 
 \begin{table}[H]
   \centering
-  \caption{Resumen de compilación del proyecto en Quartus Prime 25.1std.}
+  \caption{Resumen de compilación del proyecto en Quartus Prime 18.1.}
   \label{tab:sintesis}
   \begin{tabular}{@{}l r@{}}
     \toprule
@@ -455,7 +453,7 @@ en la tarjeta y simularlo exigiría $2^{25}$ ciclos por cada flanco.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{practica4/evidencias/simulacion.png}
+  \includegraphics[width=\textwidth]{simulacion.png}
   \caption{Forma de onda de la simulación funcional. Se muestran el reloj, el estado presente
   (\texttt{edo}), la liga seleccionada y sus versiones falsa y verdadera, la palabra leída de
   memoria (\texttt{palabra\_mem}), la parte de prueba, las entradas $Q_1$ a $Q_4$ y las
