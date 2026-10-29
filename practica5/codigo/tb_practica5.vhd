@@ -64,31 +64,31 @@ architecture sim of tb_practica5 is
 	type vector_t is record
 		e : std_logic_vector(3 downto 0);        --X Y Z W
 		edo_esp : std_logic_vector(2 downto 0);
-		sal_esp : std_logic_vector(3 downto 0);  --S1 S2 U1 U2 durante el estado previo
+		sal_esp : std_logic_vector(3 downto 0);  --S1 S2 U1 U2 (U1,U2 activas en bajo)
 	end record;
 	type lista_t is array (natural range <>) of vector_t;
 
 	-- sal_esp es lo que deben valer las salidas MIENTRAS se aplica el vector,
 	-- es decir antes del flanco que lleva a edo_esp.
 	constant SECUENCIA : lista_t := (
-		(e => "1000", edo_esp => "100", sal_esp => "1100"), --E0 X=1: S1 S2, carga E4
-		(e => "0000", edo_esp => "101", sal_esp => "1100"), --E4 Y=0: S1 S2, +1 -> E5
-		(e => "0000", edo_esp => "110", sal_esp => "0011"), --E5 X=0: U1 U2, +1 -> E6
-		(e => "0000", edo_esp => "000", sal_esp => "1111"), --E6 incondicional: todas, carga E0
-		(e => "0000", edo_esp => "001", sal_esp => "1010"), --E0 X=0: S1 U1, +1 -> E1
-		(e => "0000", edo_esp => "001", sal_esp => "0001"), --E1 Y=0: U2, carga E1 (autolazo)
-		(e => "0100", edo_esp => "010", sal_esp => "0101"), --E1 Y=1: U2 S2, +1 -> E2
-		(e => "0000", edo_esp => "011", sal_esp => "1010"), --E2 Z=0: S1 U1, +1 -> E3
-		(e => "0000", edo_esp => "000", sal_esp => "0101"), --E3 incondicional: S2 U2, carga E0
-		(e => "0000", edo_esp => "001", sal_esp => "1010"), --E0 X=0: +1 -> E1
-		(e => "0100", edo_esp => "010", sal_esp => "0101"), --E1 Y=1: +1 -> E2
-		(e => "0010", edo_esp => "000", sal_esp => "1011"), --E2 Z=1: S1 U1 U2, carga E0
-		(e => "1000", edo_esp => "100", sal_esp => "1100"), --E0 X=1: carga E4
-		(e => "0100", edo_esp => "110", sal_esp => "1110"), --E4 Y=1: S1 S2 U1, carga E6
-		(e => "0000", edo_esp => "000", sal_esp => "1111"), --E6 incondicional: carga E0
-		(e => "1000", edo_esp => "100", sal_esp => "1100"), --E0 X=1: carga E4
-		(e => "0000", edo_esp => "101", sal_esp => "1100"), --E4 Y=0: +1 -> E5
-		(e => "1000", edo_esp => "000", sal_esp => "1011")  --E5 X=1: U1 U2 S1, carga E0
+		(e => "1000", edo_esp => "100", sal_esp => "1111"), --E0 X=1: S1 S2, carga E4
+		(e => "0000", edo_esp => "101", sal_esp => "1111"), --E4 Y=0: S1 S2, +1 -> E5
+		(e => "0000", edo_esp => "110", sal_esp => "0000"), --E5 X=0: U1 U2, +1 -> E6
+		(e => "0000", edo_esp => "000", sal_esp => "1100"), --E6 incondicional: todas, carga E0
+		(e => "0000", edo_esp => "001", sal_esp => "1001"), --E0 X=0: S1 U1, +1 -> E1
+		(e => "0000", edo_esp => "001", sal_esp => "0010"), --E1 Y=0: U2, carga E1 (autolazo)
+		(e => "0100", edo_esp => "010", sal_esp => "0110"), --E1 Y=1: U2 S2, +1 -> E2
+		(e => "0000", edo_esp => "011", sal_esp => "1001"), --E2 Z=0: S1 U1, +1 -> E3
+		(e => "0000", edo_esp => "000", sal_esp => "0110"), --E3 incondicional: S2 U2, carga E0
+		(e => "0000", edo_esp => "001", sal_esp => "1001"), --E0 X=0: +1 -> E1
+		(e => "0100", edo_esp => "010", sal_esp => "0110"), --E1 Y=1: +1 -> E2
+		(e => "0010", edo_esp => "000", sal_esp => "1000"), --E2 Z=1: S1 U1 U2, carga E0
+		(e => "1000", edo_esp => "100", sal_esp => "1111"), --E0 X=1: carga E4
+		(e => "0100", edo_esp => "110", sal_esp => "1101"), --E4 Y=1: S1 S2 U1, carga E6
+		(e => "0000", edo_esp => "000", sal_esp => "1100"), --E6 incondicional: carga E0
+		(e => "1000", edo_esp => "100", sal_esp => "1111"), --E0 X=1: carga E4
+		(e => "0000", edo_esp => "101", sal_esp => "1111"), --E4 Y=0: +1 -> E5
+		(e => "1000", edo_esp => "000", sal_esp => "1000")  --E5 X=1: U1 U2 S1, carga E0
 	);
 
 begin
