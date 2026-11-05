@@ -1,4 +1,5 @@
 \input{../plantilla/preambulo.tex}
+\graphicspath{{evidencias/}{practica5/evidencias/}{../assets/}{assets/}}
 
 \begin{document}
 
@@ -109,13 +110,13 @@ donde $n$ es el número de bits de estado y $m$ el número de bits por localidad
 
 La carta ASM se diseñó primero a mano, como se muestra en la figura \ref{fig:evid-asm}. Después
 se trasladó a la forma digital de la figura \ref{fig:asm}. Tiene siete estados (EST0 a EST6),
-tres entradas (X, Y y Z) y cuatro salidas: $S_1$ y $S_2$ con lógica estándar, y $\overline{S_3}$
-y $\overline{S_4}$ con lógica negada. En la carta, $\overline{S_3}$ y $\overline{S_4}$ aparecen
+tres entradas (X, Y y Z) y cuatro salidas: $S_1$ y $S_2$ con lógica estándar, y $\overline{U_1}$
+y $\overline{U_2}$ con lógica negada. En la carta, $\overline{U_1}$ y $\overline{U_2}$ aparecen
 como U1 y U2 en el diseño manual.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\textwidth]{practica5/evidencias/01-carta-asm.png}
+  \includegraphics[width=0.78\textwidth]{01-carta-asm.png}
   \caption{Carta ASM propuesta: siete estados, tres entradas y cuatro salidas, con salidas
   condicionales en las decisiones de EST0, EST1, EST2, EST4 y EST5.}
   \label{fig:asm}
@@ -123,7 +124,7 @@ como U1 y U2 en el diseño manual.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{practica5/evidencias/evidencia-carta-asm.jpg}
+  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{evidencia-carta-asm.jpg}
   \caption{Evidencia del diseño manual de la carta ASM, con la asignación de códigos de estado.}
   \label{fig:evid-asm}
 \end{figure}
@@ -164,12 +165,12 @@ estado y la condición de salto. Las salidas condicionales se describen a contin
     \textbf{Estado} & \textbf{Código} & \textbf{Salidas incondicionales} & \textbf{Prueba} & \textbf{VF} & \textbf{Liga} \\
     \midrule
     EST0 & \texttt{000} & $S_1$                                    & X   & 1 & EST4 (\texttt{100}) \\
-    EST1 & \texttt{001} & $\overline{S_4}$                         & Y   & 0 & EST1 (\texttt{001}) \\
-    EST2 & \texttt{010} & $S_1,\ \overline{S_3}$                   & Z   & 1 & EST0 (\texttt{000}) \\
-    EST3 & \texttt{011} & $S_2,\ \overline{S_4}$                   & aux & 0 & EST0 (\texttt{000}) \\
+    EST1 & \texttt{001} & $\overline{U_2}$                         & Y   & 0 & EST1 (\texttt{001}) \\
+    EST2 & \texttt{010} & $S_1,\ \overline{U_1}$                   & Z   & 1 & EST0 (\texttt{000}) \\
+    EST3 & \texttt{011} & $S_2,\ \overline{U_2}$                   & aux & 0 & EST0 (\texttt{000}) \\
     EST4 & \texttt{100} & $S_1,\ S_2$                              & Y   & 1 & EST6 (\texttt{110}) \\
-    EST5 & \texttt{101} & $\overline{S_3},\ \overline{S_4}$        & X   & 1 & EST0 (\texttt{000}) \\
-    EST6 & \texttt{110} & $S_1,\ S_2,\ \overline{S_3},\ \overline{S_4}$ & aux & 0 & EST0 (\texttt{000}) \\
+    EST5 & \texttt{101} & $\overline{U_1},\ \overline{U_2}$        & X   & 1 & EST0 (\texttt{000}) \\
+    EST6 & \texttt{110} & $S_1,\ S_2,\ \overline{U_1},\ \overline{U_2}$ & aux & 0 & EST0 (\texttt{000}) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -177,10 +178,10 @@ estado y la condición de salto. Las salidas condicionales se describen a contin
 Las salidas condicionales son las siguientes:
 
 \begin{itemize}
-  \item EST0: $\overline{S_3}$ se activa cuando X=0 (incremento a EST1), y $S_2$ cuando X=1 (carga a EST4).
+  \item EST0: $\overline{U_1}$ se activa cuando X=0 (incremento a EST1), y $S_2$ cuando X=1 (carga a EST4).
   \item EST1: $S_2$ se activa cuando Y=1 (incremento a EST2). Cuando Y=0, el estado se mantiene en sí mismo.
-  \item EST2: $\overline{S_4}$ se activa cuando Z=1 (carga a EST0). Cuando Z=0, incrementa a EST3.
-  \item EST4: $\overline{S_3}$ se activa cuando Y=1 (carga a EST6). Cuando Y=0, incrementa a EST5.
+  \item EST2: $\overline{U_2}$ se activa cuando Z=1 (carga a EST0). Cuando Z=0, incrementa a EST3.
+  \item EST4: $\overline{U_1}$ se activa cuando Y=1 (carga a EST6). Cuando Y=0, incrementa a EST5.
   \item EST5: $S_1$ se activa cuando X=1 (carga a EST0). Cuando X=0, incrementa a EST6.
 \end{itemize}
 
@@ -190,7 +191,7 @@ EST5$\to$EST6. Las transiciones incondicionales de EST3 y EST6 hacia EST0 se res
 prueba sobre \texttt{aux}.
 
 Respecto a las salidas negadas, se conserva el criterio de las prácticas anteriores: en la memoria
-se almacena el nivel físico de la señal, de modo que $\overline{S_3}$ y $\overline{S_4}$ valen
+se almacena el nivel físico de la señal, de modo que $\overline{U_1}$ y $\overline{U_2}$ valen
 \texttt{0} cuando están activas y \texttt{1} cuando están en reposo.
 
 \subsection{Tamaño de la memoria necesaria}
@@ -231,7 +232,7 @@ requiere la entrada \texttt{aux}. Por esa razón el diseño final usa prueba de 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{practica5/evidencias/evidencia-calculos.jpg}
+  \includegraphics[width=0.9\textwidth,height=0.85\textheight,keepaspectratio]{evidencia-calculos.jpg}
   \caption{Cálculo manual inicial del tamaño de la memoria, con prueba de 2 bits.}
   \label{fig:evid-calc}
 \end{figure}
@@ -248,7 +249,7 @@ La palabra se organiza como
 \underbrace{\text{Salidas V}}_{(3{:}0)}
 \]
 
-Dentro de cada campo de salidas, los bits se ordenan como $S_1 S_2 \overline{S_3} \overline{S_4}$.
+Dentro de cada campo de salidas, los bits se ordenan como $S_1 S_2 \overline{U_1} \overline{U_2}$.
 La tabla \ref{tab:memoria} presenta las ocho localidades, tal como se escribieron en el código
 \texttt{memory.vhd}.
 
@@ -275,20 +276,21 @@ La tabla \ref{tab:memoria} presenta las ocho localidades, tal como se escribiero
   \end{tabular}
 \end{table}
 
-\subsection{Implementación en VHDL y diagrama de bloques}
+\subsection{Implementación en VHDL}
 
-El sistema se describió en VHDL y se interconectó en un diagrama de bloques (archivo \texttt{.bdf})
-de Quartus, que se configuró como entidad de nivel superior. La figura \ref{fig:bdf} muestra la
-interconexión. El contador entrega la dirección \texttt{SAL[2..0]}, que direcciona la memoria. La
+El sistema se describió en VHDL, repartido en nueve módulos más la entidad de nivel superior
+\texttt{practica5}. La figura \ref{fig:bdf} presenta la misma interconexión vista como
+esquemático de bloques en Quartus. El contador entrega la dirección \texttt{SAL[2..0]}, que direcciona la memoria. La
 palabra leída se separa en prueba, VF, liga y salidas F y V. El selector de entradas \texttt{mux5}
 toma la prueba y entrega la variable sensada; la compuerta XNOR la compara con VF y genera la señal
-de carga, que controla el contador y los multiplexores de liga y de salidas.
+de carga, que gobierna el contador y el multiplexor de liga. El multiplexor de salidas, en
+cambio, conmuta con el valor crudo de la variable sensada, de modo que las salidas falsas
+se aplican cuando esa variable vale 0 y las verdaderas cuando vale 1.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{practica5/evidencias/diagrama-bloques-p5.png}
-  \caption{Diagrama a bloques de nivel superior (archivo \texttt{.bdf}) del método de
-  direccionamiento implícito.}
+  \includegraphics[width=\textwidth]{diagrama-bloques-p5.png}
+  \caption{Esquemático en Quartus con la interconexión de los módulos.}
   \label{fig:bdf}
 \end{figure}
 
@@ -348,12 +350,19 @@ una frecuencia de transición perceptible.
 \captionof{figure}{Código VHDL del divisor de frecuencia.}
 \label{fig:divfrec}
 
+Finalmente, la entidad \texttt{practica5} instancia los módulos anteriores y los interconecta,
+además de exponer el estado presente hacia los LEDs para poder observarlo.
+
+\lstinputlisting[style=hdl]{codigo/practica5.vhd}
+\captionof{figure}{Código VHDL de la entidad de nivel superior que interconecta los módulos.}
+\label{fig:top}
+
 \subsection{Asignación de pines}
 
 Para la implementación en la tarjeta DE10-Lite (dispositivo MAX 10 10M50DAF484C7G) se realizó la
 asignación de la tabla \ref{tab:pines}. Las entradas X, Y, Z y W se asignaron a los interruptores
-SW0 a SW3, el \textit{reset} al botón \texttt{KEY0}, las salidas S1, S2, $\overline{S_3}$ y
-$\overline{S_4}$ a \texttt{LEDR0} a \texttt{LEDR3}, y los tres bits del estado presente a
+SW0 a SW3, el \textit{reset} al botón \texttt{KEY0}, las salidas $S_1$, $S_2$, $\overline{U_1}$ y
+$\overline{U_2}$ a \texttt{LEDR0} a \texttt{LEDR3}, y los tres bits del estado presente a
 \texttt{LEDR9}, \texttt{LEDR8} y \texttt{LEDR7}.
 
 \begin{table}[H]
@@ -373,8 +382,8 @@ $\overline{S_4}$ a \texttt{LEDR0} a \texttt{LEDR3}, y los tres bits del estado p
     \texttt{W}       & \texttt{PIN\_C12} & \texttt{SW3}    & Entrada W (no usada por la carta) \\
     \texttt{S1}      & \texttt{PIN\_A8}  & \texttt{LEDR0}  & Salida $S_1$ (activa en 1) \\
     \texttt{S2}      & \texttt{PIN\_A9}  & \texttt{LEDR1}  & Salida $S_2$ (activa en 1) \\
-    \texttt{U1}      & \texttt{PIN\_A10} & \texttt{LEDR2}  & Salida $\overline{S_3}$ (activa en 0) \\
-    \texttt{U2}      & \texttt{PIN\_B10} & \texttt{LEDR3}  & Salida $\overline{S_4}$ (activa en 0) \\
+    \texttt{U1}      & \texttt{PIN\_A10} & \texttt{LEDR2}  & Salida $\overline{U_1}$ (activa en 0) \\
+    \texttt{U2}      & \texttt{PIN\_B10} & \texttt{LEDR3}  & Salida $\overline{U_2}$ (activa en 0) \\
     \texttt{EDO[2]}  & \texttt{PIN\_B11} & \texttt{LEDR9}  & Bit 2 del estado presente \\
     \texttt{EDO[1]}  & \texttt{PIN\_A11} & \texttt{LEDR8}  & Bit 1 del estado presente \\
     \texttt{EDO[0]}  & \texttt{PIN\_D14} & \texttt{LEDR7}  & Bit 0 del estado presente \\
@@ -384,8 +393,40 @@ $\overline{S_4}$ a \texttt{LEDR0} a \texttt{LEDR3}, y los tres bits del estado p
 
 \section{Análisis de resultados}
 
-El proyecto se compiló en Quartus Prime 25.1std Lite Edition sin errores. Antes de programar la
-tarjeta se verificó el comportamiento del diseño mediante simulación funcional.
+El proyecto se compiló en Quartus Prime 18.1.0 Lite Edition sin errores. La tabla
+\ref{tab:sintesis} resume los recursos utilizados y el desempeño reportado por la herramienta.
+
+\begin{table}[H]
+  \centering
+  \caption{Resumen de compilación del proyecto en Quartus Prime 18.1.}
+  \label{tab:sintesis}
+  \begin{tabular}{@{}l r@{}}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Elementos lógicos            & 62 / 49\,760 ($<1\%$) \\
+    Registros dedicados          & 31 / 49\,760 ($<1\%$) \\
+    Pines de E/S                 & 13 / 360 (4\%) \\
+    Bits de memoria embebida     & 0 / 1\,677\,312 (0\%) \\
+    $F_{max}$ (modelo 1200 mV, 85 $^\circ$C) & 168.75 MHz \\
+    Errores de compilación       & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Dos cifras de la tabla \ref{tab:sintesis} merecen comentario. La primera es el conteo de 31
+registros: 28 corresponden al contador del divisor de frecuencia y los 3 restantes al registro de
+estado, lo que confirma que el único elemento secuencial del lazo de la máquina es ese registro.
+La segunda es que la herramienta reporta cero bits de memoria embebida, ya que la ROM de 120 bits
+no se mapeó a los bloques M9K del dispositivo sino que se sintetizó como lógica combinacional
+dentro de los 62 elementos lógicos; esto es razonable dado su tamaño y no altera el comportamiento
+del circuito. Los 168.75~MHz de frecuencia máxima superan ampliamente los 50~MHz del oscilador, de
+modo que el diseño opera con holgura; la advertencia de incumplimiento temporal que emite el
+analizador se debe únicamente a que el proyecto no incluye un archivo \texttt{.sdc}, y en ausencia
+de restricciones Quartus asume un requisito por omisión de 1~GHz.
+
+Antes de programar la tarjeta se verificó el comportamiento del diseño mediante simulación
+funcional.
 
 \subsection{Simulación funcional}
 
@@ -398,10 +439,10 @@ cada una con la carta ASM mediante sentencias \texttt{assert}. Al finalizar repo
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{practica5/evidencias/simulacion.png}
+  \includegraphics[width=\textwidth]{simulacion.png}
   \caption{Forma de onda de la simulación funcional. Se muestran el reloj, las entradas, el estado
-  presente, la palabra leída de memoria, la prueba, VF, la liga, la carga y las salidas durante las
-  18 transiciones.}
+  presente (\texttt{edo}), la palabra leída de memoria (\texttt{palabra\_mem}), la parte de prueba,
+  la liga, la variable sensada y los tres juegos de salidas durante las 18 transiciones.}
   \label{fig:sim}
 \end{figure}
 
@@ -438,8 +479,8 @@ de 15 bits, es decir, 120 bits en total (tabla \ref{tab:memoria}). La simulació
 no presentó discrepancias respecto a la carta ASM, y el funcionamiento en la tarjeta coincidió con la
 simulación, lo que confirma que el contenido de la memoria y la lógica de carga e incremento son
 consistentes entre sí. Lo que más me aportó la práctica fue entender que las salidas condicionales se
-obtienen desdoblando el campo de salidas en dos conjuntos y seleccionando uno de ellos con la señal de
-carga, y que esa selección se hace en el mismo lugar donde se decide el siguiente estado.
+obtienen desdoblando el campo de salidas en dos conjuntos y seleccionando uno de ellos con el valor de
+la variable sensada, la misma que alimenta la XNOR que decide el siguiente estado.
 
 \renewcommand{\refname}{Bibliografía}
 \begin{thebibliography}{9}
