@@ -1,0 +1,25 @@
+\begin{tabular}{@{}c c c c c c cccc@{}}
+\toprule
+ & & \multicolumn{2}{c}{\textbf{Prueba}} & & & \multicolumn{4}{c}{\textbf{Salidas}} \\
+\cmidrule(lr){3-4} \cmidrule(lr){7-10}
+\textbf{Dir.} & \textbf{Edo.} & bin & var & \textbf{VF} & \textbf{MI} & $S_0$ & $S_1$ & $\overline{S_2}$ & $\overline{S_3}$ \\
+\midrule
+0 & E0 & \texttt{00} & X & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{0} & \texttt{1} & \texttt{1} \\
+1 & E1 & \texttt{11} & --- & \texttt{0} & \texttt{C} (\texttt{00}) & \texttt{1} & \texttt{0} & \texttt{1} & \texttt{1} \\
+2 & E2 & \texttt{01} & Y & \texttt{1} & \texttt{SCO} (\texttt{01}) & \texttt{1} & \texttt{1} & \texttt{1} & \texttt{1} \\
+3 & E3 & \texttt{11} & --- & \texttt{0} & \texttt{C} (\texttt{00}) & \texttt{0} & \texttt{0} & \texttt{0} & \texttt{1} \\
+4 & E4 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{0} & \texttt{1} & \texttt{0} \\
+5 & E5 & \texttt{11} & --- & \texttt{0} & \texttt{C} (\texttt{00}) & \texttt{0} & \texttt{1} & \texttt{0} & \texttt{1} \\
+6 & E6 & \texttt{10} & INT & \texttt{1} & \texttt{SCI} (\texttt{11}) & \texttt{1} & \texttt{0} & \texttt{1} & \texttt{0} \\
+7 & E7 & \texttt{11} & --- & \texttt{0} & \texttt{ST} (\texttt{10}) & \texttt{0} & \texttt{0} & \texttt{1} & \texttt{1} \\
+8 & E8 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{1} & \texttt{1} & \texttt{1} \\
+9 & E9 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{1} & \texttt{0} & \texttt{1} & \texttt{1} \\
+10 & E10 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{0} & \texttt{0} & \texttt{1} \\
+11 & E11 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{0} & \texttt{1} & \texttt{0} \\
+12 & E12 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{1} & \texttt{1} & \texttt{0} & \texttt{0} \\
+13 & E13 & \texttt{00} & X & \texttt{1} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{1} & \texttt{1} & \texttt{0} \\
+14 & E14 & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{1} & \texttt{0} & \texttt{0} & \texttt{1} \\
+\midrule
+15 & --- & \texttt{11} & --- & \texttt{0} & \texttt{SCO} (\texttt{01}) & \texttt{0} & \texttt{0} & \texttt{1} & \texttt{1} \\
+\bottomrule
+\end{tabular}

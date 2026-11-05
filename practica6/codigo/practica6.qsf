@@ -1,0 +1,109 @@
+# -------------------------------------------------------------------------- #
+#
+# Copyright (C) 2018  Intel Corporation. All rights reserved.
+# Your use of Intel Corporation's design tools, logic functions 
+# and other software and tools, and its AMPP partner logic 
+# functions, and any output files from any of the foregoing 
+# (including device programming or simulation files), and any 
+# associated documentation or information are expressly subject 
+# to the terms and conditions of the Intel Program License 
+# Subscription Agreement, the Intel Quartus Prime License Agreement,
+# the Intel FPGA IP License Agreement, or other applicable license
+# agreement, including, without limitation, that your use is for
+# the sole purpose of programming logic devices manufactured by
+# Intel and sold by Intel or its authorized distributors.  Please
+# refer to the applicable agreement for further details.
+#
+# -------------------------------------------------------------------------- #
+#
+# Quartus Prime
+# Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
+# Date created = 13:36:33  November 05, 2026
+#
+# -------------------------------------------------------------------------- #
+#
+# Notes:
+#
+# 1) The default values for assignments are stored in the file:
+#		practica6_assignment_defaults.qdf
+#    If this file doesn't exist, see file:
+#		assignment_defaults.qdf
+#
+# 2) Altera recommends that you do not modify this file. This
+#    file is updated automatically by the Quartus Prime software
+#    and any changes you make may be lost or overwritten.
+#
+# -------------------------------------------------------------------------- #
+
+
+set_global_assignment -name FAMILY "MAX 10"
+set_global_assignment -name DEVICE 10M50DAF484C7G
+set_global_assignment -name TOP_LEVEL_ENTITY practica6
+set_global_assignment -name ORIGINAL_QUARTUS_VERSION 18.1.0
+set_global_assignment -name PROJECT_CREATION_TIME_DATE "13:36:33  NOVEMBER 05, 2026"
+set_global_assignment -name LAST_QUARTUS_VERSION "18.1.0 Lite Edition"
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name MIN_CORE_JUNCTION_TEMP 0
+set_global_assignment -name MAX_CORE_JUNCTION_TEMP 85
+set_global_assignment -name ERROR_CHECK_FREQUENCY_DIVISOR 256
+
+# ---- Archivos de diseno ----
+set_global_assignment -name VHDL_FILE practica6.vhd
+set_global_assignment -name VHDL_FILE Secuenciador.vhd
+set_global_assignment -name VHDL_FILE memory.vhd
+set_global_assignment -name VHDL_FILE divisor_datos.vhd
+set_global_assignment -name VHDL_FILE logica_interna.vhd
+set_global_assignment -name VHDL_FILE muxDireccion.vhd
+set_global_assignment -name VHDL_FILE muxEntradas.vhd
+set_global_assignment -name VHDL_FILE muxSalidas.vhd
+set_global_assignment -name VHDL_FILE incrementador.vhd
+set_global_assignment -name VHDL_FILE registroMP.vhd
+set_global_assignment -name VHDL_FILE registroTrans.vhd
+set_global_assignment -name VHDL_FILE registroPrueba.vhd
+set_global_assignment -name VHDL_FILE registroVF.vhd
+set_global_assignment -name VHDL_FILE registroXOR.vhd
+set_global_assignment -name VHDL_FILE div_frec.vhd
+
+# ---- Pines DE10-Lite (MAX 10 10M50DAF484C7G) ----
+set_location_assignment PIN_P11  -to CLK
+set_location_assignment PIN_B8   -to RESET
+set_location_assignment PIN_B14  -to Y
+set_location_assignment PIN_F15  -to X
+set_location_assignment PIN_A7   -to INT
+set_location_assignment PIN_A14  -to INTRA[3]
+set_location_assignment PIN_A13  -to INTRA[2]
+set_location_assignment PIN_B12  -to INTRA[1]
+set_location_assignment PIN_A12  -to INTRA[0]
+set_location_assignment PIN_C12  -to INNT[3]
+set_location_assignment PIN_D12  -to INNT[2]
+set_location_assignment PIN_C11  -to INNT[1]
+set_location_assignment PIN_C10  -to INNT[0]
+set_location_assignment PIN_A8   -to SAL[3]
+set_location_assignment PIN_A9   -to SAL[2]
+set_location_assignment PIN_A10  -to SAL[1]
+set_location_assignment PIN_B10  -to SAL[0]
+set_location_assignment PIN_B11  -to EDO[3]
+set_location_assignment PIN_A11  -to EDO[2]
+set_location_assignment PIN_D14  -to EDO[1]
+set_location_assignment PIN_E14  -to EDO[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RESET
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to Y
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to X
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INT
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EDO[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EDO[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EDO[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to EDO[0]
