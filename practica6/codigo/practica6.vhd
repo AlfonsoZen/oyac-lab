@@ -21,8 +21,6 @@ entity practica6 is
 			X : in STD_LOGIC;                          --Entrada real 1
 			Y : in STD_LOGIC;                          --Entrada real 2
 			INT : in STD_LOGIC;                        --Peticion de interrupcion
-			INTRA : in STD_LOGIC_VECTOR(3 downto 0);   --Direccion de transformacion
-			INNT : in STD_LOGIC_VECTOR(3 downto 0);    --Direccion de interrupcion
 			SAL : out STD_LOGIC_VECTOR(3 downto 0);    --Salidas S1 S2 U1 U2
 			EDO : out STD_LOGIC_VECTOR(3 downto 0)     --Estado presente
 			);
@@ -111,12 +109,21 @@ architecture Estructural of practica6 is
 	signal salidasV : std_logic_vector(3 downto 0);
 	signal nPL, nMAP, nVECT : std_logic;
 	signal busD : std_logic_vector(3 downto 0);       --Entrada D compartida (tres estados)
+	signal INTRA : std_logic_vector(3 downto 0);      --Registro de transformacion
+	signal INNT : std_logic_vector(3 downto 0);       --Vector de interrupcion
 	signal var_sensada : std_logic;
 	signal cond : std_logic;                          --XOR(var_sensada, VF)
 	signal nCC : std_logic;                           --cond registrada
 	signal MI_reg : std_logic_vector(1 downto 0);     --MI registrada
 
 begin
+
+	--La carta fija Reg.T = 1 0 X Y, asi que la direccion de transformacion se
+	--deriva por hardware en vez de dejarla en interruptores: las cuatro ramas
+	--del ST de E7 se eligen moviendo solo X e Y.
+	INTRA <= "10" & X & Y;
+	--El vector de interrupcion apunta a E12, la rutina de interrupcion.
+	INNT <= "1100";
 
 	DivFrec : div_frec
 		port map( reloj => CLK,

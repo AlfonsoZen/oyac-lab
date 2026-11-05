@@ -65,40 +65,24 @@ set_global_assignment -name VHDL_FILE registroXOR.vhd
 set_global_assignment -name VHDL_FILE div_frec.vhd
 
 # ---- Pines DE10-Lite (MAX 10 10M50DAF484C7G) ----
-set_location_assignment PIN_P11  -to CLK
-set_location_assignment PIN_B8   -to RESET
-set_location_assignment PIN_B14  -to Y
-set_location_assignment PIN_F15  -to X
-set_location_assignment PIN_A7   -to INT
-set_location_assignment PIN_A14  -to INTRA[3]
-set_location_assignment PIN_A13  -to INTRA[2]
-set_location_assignment PIN_B12  -to INTRA[1]
-set_location_assignment PIN_A12  -to INTRA[0]
-set_location_assignment PIN_C12  -to INNT[3]
-set_location_assignment PIN_D12  -to INNT[2]
-set_location_assignment PIN_C11  -to INNT[1]
-set_location_assignment PIN_C10  -to INNT[0]
-set_location_assignment PIN_A8   -to SAL[3]
-set_location_assignment PIN_A9   -to SAL[2]
-set_location_assignment PIN_A10  -to SAL[1]
-set_location_assignment PIN_B10  -to SAL[0]
-set_location_assignment PIN_B11  -to EDO[3]
-set_location_assignment PIN_A11  -to EDO[2]
-set_location_assignment PIN_D14  -to EDO[1]
-set_location_assignment PIN_E14  -to EDO[0]
+set_location_assignment PIN_P11 -to CLK
+set_location_assignment PIN_B8 -to RESET
+set_location_assignment PIN_C11 -to Y
+set_location_assignment PIN_C10 -to X
+set_location_assignment PIN_D12 -to INT
+set_location_assignment PIN_A8 -to SAL[3]
+set_location_assignment PIN_A9 -to SAL[2]
+set_location_assignment PIN_A10 -to SAL[1]
+set_location_assignment PIN_B10 -to SAL[0]
+set_location_assignment PIN_B11 -to EDO[3]
+set_location_assignment PIN_A11 -to EDO[2]
+set_location_assignment PIN_D14 -to EDO[1]
+set_location_assignment PIN_E14 -to EDO[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLK
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RESET
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to Y
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to X
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INT
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[3]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[2]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INTRA[0]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[3]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[2]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[1]
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to INNT[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[3]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[2]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SAL[1]
