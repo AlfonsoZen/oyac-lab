@@ -92,7 +92,7 @@ donde $n$ es el número de bits de estado y $m$ el número de bits por localidad
 
 \subsection{Planteamiento: carta ASM}
 
-La carta ASM tiene 15 estados (EST0 a EST14), tres entradas (X, Y e INT) y cuatro salidas: $S_1$
+La carta ASM tiene 15 estados (E0 a E14), tres entradas (X, Y e INT) y cuatro salidas: $S_1$
 y $S_2$ con lógica estándar, y $\overline{S_3}$ y $\overline{S_4}$ con lógica negada. La figura
 \ref{fig:asm} muestra la versión digital de la carta, y la figura \ref{fig:evid-carta-lab} la
 versión dibujada durante el laboratorio.
@@ -106,7 +106,7 @@ versión dibujada durante el laboratorio.
 
 Con 15 estados se requieren $\lceil \log_2 15 \rceil = 4$ bits, por lo que hay 16 localidades. La
 única localidad sin estado asociado (\texttt{1111}) tiene un contenido de seguridad que regresa a
-EST0. La prueba tiene 2 bits: \texttt{00} selecciona X, \texttt{01} selecciona Y, \texttt{10}
+E0. La prueba tiene 2 bits: \texttt{00} selecciona X, \texttt{01} selecciona Y, \texttt{10}
 selecciona INT y \texttt{11} selecciona una constante en cero (\texttt{aux}), que se usa en las
 transiciones incondicionales.
 
@@ -216,28 +216,28 @@ La tabla \ref{tab:memoria} presenta las 16 localidades, tal como se escribieron 
     \toprule
     \textbf{Dirección} & \textbf{Estado} & \textbf{Prueba} & \textbf{VF} & \textbf{MI} & \textbf{Liga} & \textbf{Salidas F} & \textbf{Salidas V} \\
     \midrule
-    0000 & EST0  & 00 & 0 & 01 & 0000 & 0011 & 0011 \\
-    0001 & EST1  & 11 & 0 & 00 & 0000 & 1011 & 1011 \\
-    0010 & EST2  & 01 & 1 & 01 & 0101 & 1111 & 1111 \\
-    0011 & EST3  & 11 & 0 & 00 & 0000 & 0001 & 0001 \\
-    0100 & EST4  & 11 & 0 & 01 & 0110 & 0010 & 0010 \\
-    0101 & EST5  & 11 & 0 & 00 & 0000 & 0101 & 0101 \\
-    0110 & EST6  & 10 & 1 & 11 & 0000 & 1010 & 1010 \\
-    0111 & EST7  & 11 & 0 & 10 & 0000 & 0011 & 0011 \\
-    1000 & EST8  & 11 & 0 & 01 & 1101 & 0111 & 0111 \\
-    1001 & EST9  & 11 & 0 & 01 & 1101 & 1011 & 1011 \\
-    1010 & EST10 & 11 & 0 & 01 & 1101 & 0001 & 0001 \\
-    1011 & EST11 & 11 & 0 & 01 & 1101 & 0010 & 0010 \\
-    1100 & EST12 & 11 & 0 & 01 & 0000 & 1100 & 1100 \\
-    1101 & EST13 & 00 & 1 & 01 & 0010 & 0110 & 0110 \\
-    1110 & EST14 & 11 & 0 & 01 & 0000 & 1001 & 1001 \\
+    0000 & E0  & 00 & 0 & 01 & 0000 & 0011 & 0011 \\
+    0001 & E1  & 11 & 0 & 00 & 0000 & 1011 & 1011 \\
+    0010 & E2  & 01 & 1 & 01 & 0101 & 1111 & 1111 \\
+    0011 & E3  & 11 & 0 & 00 & 0000 & 0001 & 0001 \\
+    0100 & E4  & 11 & 0 & 01 & 0110 & 0010 & 0010 \\
+    0101 & E5  & 11 & 0 & 00 & 0000 & 0101 & 0101 \\
+    0110 & E6  & 10 & 1 & 11 & 0000 & 1010 & 1010 \\
+    0111 & E7  & 11 & 0 & 10 & 0000 & 0011 & 0011 \\
+    1000 & E8  & 11 & 0 & 01 & 1101 & 0111 & 0111 \\
+    1001 & E9  & 11 & 0 & 01 & 1101 & 1011 & 1011 \\
+    1010 & E10 & 11 & 0 & 01 & 1101 & 0001 & 0001 \\
+    1011 & E11 & 11 & 0 & 01 & 1101 & 0010 & 0010 \\
+    1100 & E12 & 11 & 0 & 01 & 0000 & 1100 & 1100 \\
+    1101 & E13 & 00 & 1 & 01 & 0010 & 0110 & 0110 \\
+    1110 & E14 & 11 & 0 & 01 & 0000 & 1001 & 1001 \\
     1111 & (sin uso) & 11 & 0 & 01 & 0000 & 0011 & 0011 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
-En EST7, la microinstrucción ST entrega la dirección de transformación. Esa dirección se forma con
-\texttt{10} y las entradas X e Y, de modo que los cuatro casos llevan a EST8, EST9, EST10 o EST11
+En E7, la microinstrucción ST entrega la dirección de transformación. Esa dirección se forma con
+\texttt{10} y las entradas X e Y, de modo que los cuatro casos llevan a E8, E9, E10 o E11
 según el valor de X e Y.
 
 \subsection{Implementación en VHDL y diagrama de bloques}
@@ -294,7 +294,7 @@ La lógica interna decodifica la microinstrucción y genera las señales \texttt
 \label{fig:muxdir}
 
 Los registros de liga y de transformación comparten la entrada D del secuenciador mediante salidas
-de tres estados. El registro de interrupciones entrega el vector fijo \texttt{1100} (EST12).
+de tres estados. El registro de interrupciones entrega el vector fijo \texttt{1100} (E12).
 
 \lstinputlisting[style=hdl]{codigo/registroMP.vhd}
 \captionof{figure}{Código VHDL del registro de liga.}
@@ -394,7 +394,7 @@ registros) y maneja las entradas X, Y e INT con un reloj de 10~ns. Se omitió el
 porque sólo fija la velocidad perceptible en la tarjeta.
 
 El banco de pruebas aplica 47 pasos que recorren todos los estados de la carta, incluidos los cuatro
-saltos de transformación desde EST7 y la rutina de interrupción en EST12. Compara el estado presente
+saltos de transformación desde E7 y la rutina de interrupción en E12. Compara el estado presente
 con el esperado en cada paso. Al finalizar reporta: \textit{OK: las 47 transiciones coinciden con la
 carta ASM}.
 
@@ -435,7 +435,7 @@ máquina de 15 estados, con una memoria de 16 localidades de 17 bits, es decir, 
 (tabla \ref{tab:memoria}). La simulación con los 47 pasos del testbench no presentó discrepancias,
 y en la tarjeta la máquina respondió de acuerdo con la carta, incluido el salto a la rutina de
 interrupción. Lo que más me aportó la práctica fue entender que las transformaciones de un estado
-a varios destinos, como EST7, se resuelven con una dirección formada por las entradas, sin ocupar
+a varios destinos, como E7, se resuelven con una dirección formada por las entradas, sin ocupar
 una liga por cada caso.
 
 \renewcommand{\refname}{Bibliografía}
