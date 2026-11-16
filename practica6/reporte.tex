@@ -1,4 +1,5 @@
 \input{../plantilla/preambulo.tex}
+\graphicspath{{evidencias/}{practica6/evidencias/}{../assets/}{assets/}}
 
 \begin{document}
 
@@ -98,7 +99,7 @@ versión dibujada durante el laboratorio.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.78\textwidth]{practica6/evidencias/01-carta-asm.png}
+  \includegraphics[width=0.78\textwidth]{01-carta-asm.png}
   \caption{Carta ASM del secuenciador básico: 15 estados, entradas X, Y e INT y cuatro salidas.}
   \label{fig:asm}
 \end{figure}
@@ -142,7 +143,7 @@ numeración $S_0$ a $S_3$, que corresponde a $S_1$ a $S_4$ en el resto del repor
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{practica6/evidencias/evidencia-carta-lab.jpg}
+  \includegraphics[width=0.9\textwidth,height=0.8\textheight,keepaspectratio]{evidencia-carta-lab.jpg}
   \caption{Carta ASM dibujada durante el laboratorio, con la asignación de códigos de estado.}
   \label{fig:evid-carta-lab}
 \end{figure}
@@ -152,7 +153,7 @@ laboratorio. Es el archivo \texttt{.bdf} que se configuró como entidad de nivel
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{practica6/evidencias/diagrama-bloques-lab.png}
+  \includegraphics[width=\textwidth]{diagrama-bloques-lab.png}
   \caption{Diagrama de bloques elaborado en el laboratorio (archivo \texttt{.bdf}) del secuenciador básico.}
   \label{fig:diag-lab}
 \end{figure}
@@ -250,7 +251,7 @@ resultado se registra como la condición del secuenciador.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{practica6/evidencias/02-diagrama-bloques.png}
+  \includegraphics[width=\textwidth]{02-diagrama-bloques.png}
   \caption{Diagrama a bloques de nivel superior (archivo \texttt{.bdf}) del secuenciador básico.}
   \label{fig:bdf}
 \end{figure}
@@ -353,8 +354,36 @@ $\overline{S_4}$ se asignaron a \texttt{LEDR0} a \texttt{LEDR3}, y el estado pre
 
 \section{Análisis de resultados}
 
-El proyecto se compiló en Quartus Prime 25.1std Lite Edition sin errores. Antes de programar la
-tarjeta se verificó el comportamiento del diseño mediante simulación funcional.
+El proyecto se compiló en Quartus Prime 18.1.0 Lite Edition sin errores. La tabla
+\ref{tab:sintesis} resume los recursos utilizados.
+
+\begin{table}[H]
+  \centering
+  \caption{Resumen de compilación del proyecto en Quartus Prime 18.1.}
+  \label{tab:sintesis}
+  \begin{tabular}{@{}l r@{}}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Elementos lógicos            & 82 / 49\,760 ($<1\%$) \\
+    Registros dedicados          & 42 / 49\,760 ($<1\%$) \\
+    Pines de E/S                 & 13 / 360 (4\%) \\
+    Bits de memoria embebida     & 0 / 1\,677\,312 (0\%) \\
+    Errores de compilación       & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+El conteo de 42 registros es consistente con el diseño: 28 corresponden al contador del
+divisor de frecuencia y los 14 restantes a los elementos secuenciales del secuenciador, esto
+es, los cuatro bits del registro $\mu$PC, los cuatro del bus de salto, los dos del registro de
+la microinstrucción, el biestable de la condición y los del registro de transformación
+seleccionado. Como en las prácticas anteriores, la herramienta reporta cero bits de memoria
+embebida, pues la ROM de 272 bits se sintetizó como lógica combinacional dentro de los 82
+elementos lógicos.
+
+Antes de programar la tarjeta se verificó el comportamiento del diseño mediante simulación
+funcional.
 
 \subsection{Simulación funcional}
 
@@ -371,7 +400,7 @@ carta ASM}.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{practica6/evidencias/simulacion.png}
+  \includegraphics[width=\textwidth]{simulacion.png}
   \caption{Forma de onda de la simulación funcional. Se muestran el reloj, las entradas X, Y e INT,
   el estado presente \texttt{edo}, la palabra leída de memoria, la prueba, VF, la microinstrucción
   \texttt{mi}, la liga, las señales de habilitación, la condición y las salidas.}
