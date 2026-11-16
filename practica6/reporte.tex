@@ -1,0 +1,408 @@
+\input{../plantilla/preambulo.tex}
+\graphicspath{{evidencias/}{practica6/evidencias/}{../assets/}{assets/}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\noindent
+\begin{minipage}[c]{0.45\textwidth}\centering
+  \includegraphics[height=3.2cm]{logo-unam.jpg}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.45\textwidth}\centering
+  \includegraphics[height=3.2cm]{logo-fi.png}
+\end{minipage}
+
+\vspace{1.2cm}
+{\Large\bfseries UNIVERSIDAD NACIONAL AUTÓNOMA\\[2pt] DE MÉXICO\par}
+\vspace{0.9cm}
+{\large\bfseries FACULTAD DE INGENIERÍA\par}
+\vspace{0.6cm}
+{\large\bfseries INGENIERÍA EN COMPUTACIÓN\par}
+\vspace{0.6cm}
+{\bfseries Laboratorio de Organización de Arquitectura de Computadoras\par}
+\vspace{0.9cm}
+{\bfseries Reporte - Secuenciador básico\par}
+
+\vspace{1.0cm}
+\raggedright
+{\bfseries NOMBRE DE LOS INTEGRANTES:}\\
+Omar Alfonso Zendejas Labias \quad Grupo de Teoría: 04\\
+Emiliano García Olvera \quad Grupo de Teoría: 02
+
+\vspace{1.0cm}
+{\bfseries NOMBRE DEL PROFESOR: ING. KAREN PÉREZ}
+
+\vspace{0.6cm}
+{\bfseries GRUPO: 06 \quad EQUIPO: 9}
+
+\vspace{0.6cm}
+{\bfseries SEMESTRE:} \underline{2027-1.}
+
+\vspace{0.6cm}
+\hfill {\bfseries FECHA DE ENTREGA: 19 de noviembre de 2026}
+\thispagestyle{empty}
+\end{titlepage}
+
+\setcounter{page}{1}
+
+\section{Objetivo}
+
+Construir un secuenciador básico y emplearlo para ejecutar una carta ASM, reconociendo
+en él la pieza que sirve de base a la unidad de control de un procesador. A diferencia de
+los métodos de las prácticas anteriores, donde la memoria resolvía por sí sola el estado
+siguiente, aquí la dirección puede provenir de cuatro orígenes distintos según la
+microinstrucción que se ejecute.
+
+Para ello se diseñó una carta ASM de quince estados con dos entradas reales, se construyó
+la lógica interna que decodifica las cuatro microinstrucciones del secuenciador, se obtuvo
+el contenido de memoria correspondiente y se implementó el sistema en VHDL sobre la
+tarjeta DE10-Lite mediante Quartus Prime, verificando su funcionamiento por simulación y
+en hardware.
+
+\section{Introducción}
+
+En las prácticas anteriores el estado siguiente se resolvía de forma cerrada dentro de la
+memoria: en el direccionamiento por trayectoria la dirección se formaba concatenando el
+estado presente con las entradas, y en el implícito la palabra ofrecía una liga y la
+alternativa de incrementar un contador. Un \textbf{secuenciador} generaliza esa idea al
+permitir que la dirección del estado siguiente provenga de varios orígenes, lo que habilita
+construcciones propias de la programación estructurada, como subrutinas, bucles y
+bifurcaciones múltiples \cite{savage}.
+
+El secuenciador básico que describe el manual entrega la dirección del estado siguiente por
+el bus $Y$, y ésta puede venir de dos lugares: del registro de microprograma ($\mu$PC), que
+guarda la dirección del multiplexor incrementada en una unidad, o de la entrada $D$. A esta
+última se conectan tres fuentes distintas: el campo de liga de la propia palabra, el
+registro de transformación y el registro de interrupciones. Las tres comparten el bus
+mediante salidas de tres estados, y la lógica interna habilita una sola a la vez con las
+señales $\overline{PL}$, $\overline{MAP}$ y $\overline{VECT}$.
+
+Cuál de ellas se habilita lo determina la microinstrucción almacenada en el campo MI, que
+admite cuatro valores \cite{savage}:
+
+\begin{itemize}[nosep]
+  \item \textbf{C} (\texttt{00}, continúa): la dirección la proporciona el registro
+  $\mu$PC, es decir, el estado presente más uno.
+  \item \textbf{SCO} (\texttt{01}, salto condicional): si $\overline{cc}$ vale cero la
+  dirección proviene del $\mu$PC; si vale uno, la aporta el registro seleccionado por
+  $\overline{PL}$, esto es, el campo de liga.
+  \item \textbf{ST} (\texttt{10}, salto de transformación): la dirección se obtiene del
+  registro seleccionado por $\overline{MAP}$. El manual introduce para este caso una
+  notación nueva, un rombo con varias bifurcaciones, donde la rama elegida depende del
+  contenido del registro de transformación.
+  \item \textbf{SCI} (\texttt{11}, salto por interrupción): se comporta como SCO, pero la
+  dirección proviene del registro seleccionado por $\overline{VECT}$.
+\end{itemize}
+
+La condición $\overline{cc}$ se construye igual que en la práctica anterior: un
+multiplexor elige, con el campo de prueba, cuál de las variables de entrada se sensa, y una
+compuerta XOR compara ese valor con el campo VF. Dado que la dirección se forma con el
+estado presente únicamente, el tamaño de la memoria queda determinado por
+
+\begin{equation}
+\text{Memoria} = 2^{n} \times m
+\label{eq:tam}
+\end{equation}
+
+donde $n$ es el número de bits de estado y $m$ la suma de los bits de prueba, VF, MI, liga
+y salidas.
+
+\section{Desarrollo}
+
+\subsection{Planteamiento: carta ASM}
+
+Se diseñó la carta ASM de la figura \ref{fig:asm}, con quince estados (E0 a E14), dos
+entradas reales ($X$ y $Y$), la línea de interrupción $INT$ y la entrada auxiliar $Qaux$,
+además de cuatro salidas: $S_0$ y $S_1$ con lógica estándar y $\overline{S_2}$ y
+$\overline{S_3}$ con lógica negada. Cada estado indica, junto a su nombre y su código, la
+microinstrucción que ejecuta.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth,height=0.86\textheight,keepaspectratio]{01-carta-asm.png}
+  \caption{Carta ASM propuesta: quince estados, dos entradas reales, interrupción y salto
+  de transformación con cuatro bifurcaciones.}
+  \label{fig:asm}
+\end{figure}
+
+La carta ejercita las cuatro microinstrucciones. La instrucción \textbf{C} aparece en E1,
+E3 y E5, donde la máquina simplemente avanza al estado consecutivo. El \textbf{SCO} se usa
+de dos maneras: como salto condicional propiamente dicho en E0 (sobre $X$), E2 (sobre $Y$) y
+E13 (sobre $X$), y como salto incondicional en E4, E8 a E12 y E14, seleccionando $Qaux$ en
+el campo de prueba, que es una constante y por lo tanto hace que la condición se cumpla
+siempre. El \textbf{SCI} está en E6, que sensa $INT$: cuando vale cero la máquina continúa
+a E7 y cuando vale uno salta al vector de interrupción, que apunta a E12. Finalmente, el
+\textbf{ST} está en E7, cuyo rombo de cuatro bifurcaciones lleva a E8, E9, E10 u E11 según
+el contenido del registro de transformación.
+
+Una restricción propia de este método condicionó la asignación de códigos: puesto que la
+rama que no salta avanza por incremento, en toda decisión uno de los dos destinos debe ser
+el estado consecutivo. Por eso E0 continúa a E1, E2 a E3, E6 a E7 y E13 a E14, mientras que
+la otra rama de cada decisión sí requiere una liga explícita.
+
+\subsection{Tamaño de la memoria necesaria}
+
+La dirección se forma únicamente con los 4 bits del estado presente, por lo que $n = 4$ y la
+memoria tiene $2^4 = 16$ localidades. Cada localidad almacena los campos del método:
+
+\begin{center}
+\begin{tabular}{@{}l r@{}}
+\toprule
+\textbf{Campo} & \textbf{Bits} \\
+\midrule
+Parte de prueba ($X$, $Y$, $INT$ y $Qaux$) & 2 \\
+VF                                         & 1 \\
+MI (microinstrucción)                      & 2 \\
+Liga                                       & 4 \\
+Salidas falsas                             & 4 \\
+Salidas verdaderas                         & 4 \\
+\midrule
+\textbf{Total} $m$                         & \textbf{17} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+De acuerdo con la ecuación \ref{eq:tam},
+
+\[
+\text{Memoria} = 2^{4} \times 17 = 16 \times 17 = 272 \text{ bits},
+\]
+
+es decir, 16 localidades de 17 bits. Quince corresponden a los estados de la carta y la
+localidad \texttt{1111} no se utiliza; se le asignó un contenido de seguridad que la
+devuelve a E0 con las salidas en reposo.
+
+Conviene notar que el ancho de la palabra creció respecto a la práctica anterior, de 15 a 17
+bits, por los dos bits del campo MI y por la liga de 4 bits. A cambio, una sola localidad
+puede expresar un salto de cuatro destinos, algo que con direccionamiento implícito habría
+exigido estados intermedios.
+
+\subsection{Contenido de la memoria}
+
+El contenido se obtuvo recorriendo la carta estado por estado. La palabra se organiza como
+
+\[
+\text{dato} = \underbrace{\text{Prueba}}_{(16{:}15)} \ \Vert \
+\underbrace{\text{VF}}_{(14)} \ \Vert \
+\underbrace{\text{MI}}_{(13{:}12)} \ \Vert \
+\underbrace{\text{Liga}}_{(11{:}8)} \ \Vert \
+\underbrace{\text{Salidas falsas}}_{(7{:}4)} \ \Vert \
+\underbrace{\text{Salidas verdaderas}}_{(3{:}0)}
+\]
+
+La carta no contiene salidas condicionales, de modo que los dos campos de salidas son
+idénticos en todas las localidades; se conservan ambos porque el formato de palabra lo
+define el módulo \texttt{divisor\_datos} que proporcionó la profesora. La tabla
+\ref{tab:memoria} presenta las 16 localidades, mostrando un solo juego de salidas para no
+repetir información.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Contenido de memoria del secuenciador. La dirección 15 corresponde al código de
+  estado no utilizado.}
+  \label{tab:memoria}
+  \small
+  \setlength{\tabcolsep}{6pt}
+\input{tabla_memoria.tex}
+\end{table}
+
+\subsection{Implementación en VHDL}
+
+El sistema se describió en VHDL siguiendo los dos diagramas de bloques de la práctica. El
+módulo \texttt{Secuenciador} agrupa la lógica interna, el registro $\mu$PC, el incrementador
+y el multiplexor de dirección, tal como muestra la figura \ref{fig:sec}; el nivel superior
+lo conecta con la memoria, el divisor de datos, los tres registros de salto y los
+multiplexores de entrada y de salida, como muestra la figura \ref{fig:bdf}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.88\textwidth]{03-secuenciador.png}
+  \caption{Diagrama interno del secuenciador básico.}
+  \label{fig:sec}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{02-diagrama-bloques.png}
+  \caption{Diagrama de bloques del secuenciador conectado a la memoria.}
+  \label{fig:bdf}
+\end{figure}
+
+El módulo \texttt{logica\_interna} decodifica la microinstrucción y produce el selector del
+multiplexor de dirección junto con las tres señales de habilitación. Es la pieza que
+distingue a esta práctica, ya que traduce cada microinstrucción en una elección de origen
+para la dirección del estado siguiente.
+
+\lstinputlisting[style=hdl]{codigo/logica_interna.vhd}
+\captionof{figure}{Código VHDL de la lógica interna que decodifica las cuatro
+microinstrucciones.}
+\label{fig:logint}
+
+El módulo \texttt{memory} implementa la ROM de 16 palabras de 17 bits. Cada asignación
+corresponde a un renglón de la tabla \ref{tab:memoria} y está comentada con el estado y la
+transición que representa.
+
+\lstinputlisting[style=hdl]{codigo/memory.vhd}
+\captionof{figure}{Código VHDL de la memoria con las dieciséis localidades.}
+\label{fig:memory}
+
+El módulo \texttt{divisor\_datos} separa la palabra leída en sus seis campos.
+
+\lstinputlisting[style=hdl]{codigo/divisor_datos.vhd}
+\captionof{figure}{Código VHDL del divisor que separa la palabra de memoria.}
+\label{fig:divisor}
+
+La entidad \texttt{Secuenciador} reproduce el diagrama de la figura \ref{fig:sec}.
+
+\lstinputlisting[style=hdl]{codigo/Secuenciador.vhd}
+\captionof{figure}{Código VHDL del secuenciador básico.}
+\label{fig:secvhd}
+
+Finalmente, la entidad \texttt{practica6} instancia los módulos anteriores y los
+interconecta, además de exponer el estado presente hacia los LEDs.
+
+\lstinputlisting[style=hdl]{codigo/practica6.vhd}
+\captionof{figure}{Código VHDL de la entidad de nivel superior.}
+\label{fig:top}
+
+\subsection{Dos decisiones de implementación}
+
+\textbf{Registro de la microinstrucción.} Al simular el diseño con los módulos conectados de
+forma puramente combinacional, el simulador alcanzó el límite de iteraciones sin converger.
+La causa es un lazo combinacional cerrado: el estado presente direcciona la memoria, ésta
+entrega MI, MI determina el selector a través de la lógica interna, y ese selector define de
+nuevo el estado presente a la salida del multiplexor de dirección. El lazo se rompe
+registrando MI, que es precisamente la función del registro etiquetado \texttt{MI} en el
+diagrama de la profesora. Con MI, la condición y la dirección de salto registradas, el
+secuenciador opera sobre la palabra leída en el ciclo anterior mientras la memoria busca la
+siguiente, que es el comportamiento en cascada característico de un microsecuenciador real.
+
+\textbf{Origen de las direcciones de salto.} En el diagrama de bloques, las entradas de los
+registros de transformación e interrupciones provienen del exterior. Puesto que la carta
+define el contenido del registro de transformación como $1\,0\,X\,Y$ y el vector de
+interrupción como la dirección de E12, ambas se derivaron por hardware en el nivel superior
+en lugar de exponerlas como interruptores:
+
+\begin{center}
+\texttt{INTRA <= "10" \& X \& Y;} \qquad \texttt{INNT <= "1100";}
+\end{center}
+
+Con ello las cuatro bifurcaciones del salto de transformación se seleccionan moviendo
+únicamente $X$ y $Y$, y el vector de interrupción siempre apunta al estado que la carta
+indica.
+
+\subsection{Asignación de pines}
+
+Para la implementación en la tarjeta DE10-Lite (dispositivo MAX 10 10M50DAF484C7G) se
+realizó la asignación de la tabla \ref{tab:pines}. Al derivar por hardware las direcciones
+de salto, el diseño requiere únicamente tres interruptores y un botón.
+
+\begin{table}[H]
+  \centering
+  \caption{Asignación de pines en la tarjeta DE10-Lite.}
+  \label{tab:pines}
+  \small
+  \begin{tabular}{@{}l l l l@{}}
+    \toprule
+    \textbf{Señal} & \textbf{Pin} & \textbf{Recurso} & \textbf{Función} \\
+    \midrule
+    \texttt{CLK}    & \texttt{PIN\_P11} & \texttt{MAX10\_CLK1\_50} & Reloj de 50 MHz \\
+    \texttt{RESET}  & \texttt{PIN\_B8}  & \texttt{KEY0}   & \textit{Reset} activo en bajo \\
+    \texttt{X}      & \texttt{PIN\_C10} & \texttt{SW0}    & Entrada $X$ \\
+    \texttt{Y}      & \texttt{PIN\_C11} & \texttt{SW1}    & Entrada $Y$ \\
+    \texttt{INT}    & \texttt{PIN\_D12} & \texttt{SW2}    & Petición de interrupción \\
+    \texttt{SAL[3]} & \texttt{PIN\_A8}  & \texttt{LEDR0}  & Salida $S_0$ (activa en 1) \\
+    \texttt{SAL[2]} & \texttt{PIN\_A9}  & \texttt{LEDR1}  & Salida $S_1$ (activa en 1) \\
+    \texttt{SAL[1]} & \texttt{PIN\_A10} & \texttt{LEDR2}  & Salida $\overline{S_2}$ (activa en 0) \\
+    \texttt{SAL[0]} & \texttt{PIN\_B10} & \texttt{LEDR3}  & Salida $\overline{S_3}$ (activa en 0) \\
+    \texttt{EDO[3]} & \texttt{PIN\_B11} & \texttt{LEDR9}  & Bit 3 del estado presente \\
+    \texttt{EDO[2]} & \texttt{PIN\_A11} & \texttt{LEDR8}  & Bit 2 del estado presente \\
+    \texttt{EDO[1]} & \texttt{PIN\_D14} & \texttt{LEDR7}  & Bit 1 del estado presente \\
+    \texttt{EDO[0]} & \texttt{PIN\_E14} & \texttt{LEDR6}  & Bit 0 del estado presente \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Análisis de resultados}
+
+El proyecto se compiló en Quartus Prime 18.1.0 Lite Edition sin errores. La tabla
+\ref{tab:sintesis} resume los recursos utilizados.
+
+\begin{table}[H]
+  \centering
+  \caption{Resumen de compilación del proyecto en Quartus Prime 18.1.}
+  \label{tab:sintesis}
+  \begin{tabular}{@{}l r@{}}
+    \toprule
+    \textbf{Parámetro} & \textbf{Valor} \\
+    \midrule
+    Elementos lógicos            & 82 / 49\,760 ($<1\%$) \\
+    Registros dedicados          & 42 / 49\,760 ($<1\%$) \\
+    Pines de E/S                 & 13 / 360 (4\%) \\
+    Bits de memoria embebida     & 0 / 1\,677\,312 (0\%) \\
+    Errores de compilación       & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+El conteo de 42 registros es consistente con el diseño: 28 corresponden al contador del
+divisor de frecuencia y los 14 restantes a los elementos secuenciales del secuenciador, esto
+es, los cuatro bits del registro $\mu$PC, los cuatro del bus de salto, los dos del registro
+de la microinstrucción, el biestable de la condición y los del registro de transformación
+seleccionado. Como en las prácticas anteriores, la herramienta reporta cero bits de memoria
+embebida, pues la ROM de 272 bits se sintetizó como lógica combinacional dentro de los 82
+elementos lógicos.
+
+\todo[inline]{Verificar en el informe del analizador temporal cuál es la frecuencia máxima
+del lazo del secuenciador. El valor que Quartus reporta de forma destacada (109.79 MHz)
+corresponde al contador del divisor de frecuencia, no al lazo de la máquina de estados, por
+lo que no debe citarse como si lo fuera.}
+
+\subsection{Simulación funcional}
+
+Antes de programar la tarjeta se verificó el diseño mediante simulación funcional con un
+\textit{testbench} autoverificable. El banco de pruebas aplica una secuencia de 47
+transiciones que recorre los quince estados, ambas ramas de cada decisión y las cuatro
+bifurcaciones del salto de transformación, y compara el estado resultante de cada transición
+con el previsto por la carta ASM mediante sentencias \texttt{assert}. La simulación concluyó
+sin discrepancias.
+
+\todo[inline]{Insertar la captura del waveform. El manual pide explícitamente demostrar el
+funcionamiento simulándolo en \textit{waveform} y que en la simulación aparezca el contenido
+de la memoria además del estado presente, de modo que la captura debe mostrar al menos
+\texttt{edo}, \texttt{palabra\_mem} y sus campos (prueba, VF, MI y liga).}
+
+\subsection{Verificación en la tarjeta}
+
+\todo[inline]{Redactar a partir de lo observado en la sesión de laboratorio. Conviene
+describir: (1) que con todos los interruptores abajo la máquina permanece en E0, acorde con
+el salto condicional de la dirección 0; (2) el recorrido del lazo con $X=1$ y $Y=0$, que
+pasa por E2, E3, E4, E6, E7, E10 y E13; (3) que al subir $Y$ el lazo se acorta porque E2
+toma su liga hacia E5, lo cual evidencia el salto condicional; (4) que al llegar a E7 el
+estado siguiente es E8, E9, E10 u E11 según el valor de $X$ e $Y$, que es la demostración
+del salto de transformación; y (5) que con $INT$ en alto la máquina se desvía en E6 hacia
+E12, el único estado con las cuatro salidas activas, lo que demuestra el salto por
+interrupción.}
+
+\section{Conclusiones individuales}
+
+\subsection{Omar Alfonso Zendejas Labias}
+
+\todo[inline]{Conclusión individual de Omar. Siguiendo el formato: un solo párrafo, en
+primera persona, indicando si se cumplió el objetivo y relacionándolo con los resultados
+concretos del reporte, sin narrar la experiencia personal.}
+
+\subsection{Emiliano García Olvera}
+
+\todo[inline]{Conclusión individual de Emiliano, con el mismo formato.}
+
+\renewcommand{\refname}{Bibliografía}
+\begin{thebibliography}{9}
+\bibitem{savage} J. Savage Carmona, G. Vázquez y N. E. Chávez Rodríguez,
+  \emph{Diseño de microprocesadores}. Ciudad de México, México: Facultad de Ingeniería,
+  Universidad Nacional Autónoma de México, 2017. [En línea]. Disponible:
+  \url{http://profesores.fi-b.unam.mx/luist/archivos/MicroprocesadoresSavage.pdf}
+\end{thebibliography}
+
+\end{document}
